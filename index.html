@@ -124,8 +124,18 @@ function fmtNum(n){
   return n.toLocaleString();
 }
 
-function yahooUrl(symbol){
-  return "https://query1.finance.yahoo.com/v8/finance/chart/"+encodeURIComponent(symbol)+"?interval=1m&range=1d&includePrePost=false";
+var RANGE_PARAMS={
+  "1D":{interval:"1m",range:"1d"},
+  "1W":{interval:"15m",range:"5d"},
+  "1M":{interval:"1h",range:"1mo"},
+  "3M":{interval:"1d",range:"3mo"},
+  "1Y":{interval:"1d",range:"1y"},
+  "5Y":{interval:"1wk",range:"5y"}
+};
+
+function yahooUrl(symbol,range){
+  var p=RANGE_PARAMS[range]||RANGE_PARAMS["1D"];
+  return "https://query1.finance.yahoo.com/v8/finance/chart/"+encodeURIComponent(symbol)+"?interval="+p.interval+"&range="+p.range+"&includePrePost=false";
 }
 
 function fetchWithProxy(url){
@@ -136,8 +146,32 @@ function fetchWithProxy(url){
   });
 }
 
+function parseChartData(data,range){
+  var result=data.chart.result[0];
+  var timestamps=result.timestamp||[];
+  var closes=(result.indicators.quote[0].close)||[];
+  var volumes=(result.indicators.quote[0].volume)||[];
+  var points=[];
+  for(var i=0;i<timestamps.length;i++){
+    if(closes[i]==null)continue;
+    var dt=new Date(timestamps[i]*1000);
+    var label="";
+    if(range==="1D"){
+      label=dt.getHours()+":"+String(dt.getMinutes()).padStart(2,"0");
+    }else if(range==="1W"){
+      label=["일","월","화","수","목","금","토"][dt.getDay()]+" "+dt.getHours()+":"+String(dt.getMinutes()).padStart(2,"0");
+    }else if(range==="1M"){
+      label=(dt.getMonth()+1)+"/"+dt.getDate();
+    }else{
+      label=dt.getFullYear()+"/"+(dt.getMonth()+1)+"/"+dt.getDate();
+    }
+    points.push({l:label,p:+closes[i].toFixed(2),v:volumes[i]||0});
+  }
+  return points;
+}
+
 function fetchQuote(symbol){
-  return fetchWithProxy(yahooUrl(symbol)).then(function(data){
+  return fetchWithProxy(yahooUrl(symbol,"1D")).then(function(data){
     var result=data.chart.result[0];
     var meta=result.meta;
     var q={
@@ -149,20 +183,28 @@ function fetchQuote(symbol){
     };
     q.change=+(q.price-q.prevClose).toFixed(2);
     q.changePct=+((q.change/q.prevClose)*100).toFixed(2);
-    // Extract intraday prices for sparkline
-    var timestamps=result.timestamp||[];
-    var closes=(result.indicators.quote[0].close)||[];
-    var volumes=(result.indicators.quote[0].volume)||[];
-    var intraday=[];
-    for(var i=0;i<timestamps.length;i++){
-      if(closes[i]!=null){
-        var dt=new Date(timestamps[i]*1000);
-        var hh=dt.getHours(),mm=dt.getMinutes();
-        intraday.push({l:hh+":"+String(mm).padStart(2,"0"),p:+closes[i].toFixed(2),v:volumes[i]||0});
-      }
-    }
-    q.intraday=intraday;
+    q.intraday=parseChartData(data,"1D");
     return q;
+  });
+}
+
+// Chart data cache: chartCache[symbol][range] = {data:[], ts:timestamp}
+var chartCache={};
+var CHART_CACHE_TTL={"1D":10000,"1W":60000,"1M":300000,"3M":300000,"1Y":600000,"5Y":600000};
+
+function fetchChartData(symbol,range){
+  // Check cache
+  if(chartCache[symbol]&&chartCache[symbol][range]){
+    var cached=chartCache[symbol][range];
+    if(Date.now()-cached.ts<(CHART_CACHE_TTL[range]||60000)){
+      return Promise.resolve(cached.data);
+    }
+  }
+  return fetchWithProxy(yahooUrl(symbol,range)).then(function(data){
+    var points=parseChartData(data,range);
+    if(!chartCache[symbol])chartCache[symbol]={};
+    chartCache[symbol][range]={data:points,ts:Date.now()};
+    return points;
   });
 }
 
@@ -241,7 +283,12 @@ function updateConnBadge(){
 
 function genDay(b){var d=[],p=b*.998;for(var i=0;i<78;i++){p*=1+(Math.random()-.49)*.004;var h=9+Math.floor((i*5)/60),m=(i*5)%60;d.push({l:h+":"+String(m).padStart(2,"0"),p:+p.toFixed(2),v:Math.floor(Math.random()*100+10)});}return d;}
 function genPeriod(b,n,vol){var d=[],p=b*(.85+Math.random()*.1);for(var i=0;i<n;i++){p*=1+(Math.random()-.48)*(vol||.02);d.push({l:"",p:+p.toFixed(2),v:Math.floor(Math.random()*80+20)});}return d;}
-function getD(b,r){if(r==="1D")return sparkCache[sel.symbol]&&sparkCache[sel.symbol].length>2&&connState==="live"?sparkCache[sel.symbol]:genDay(b);if(r==="1W")return genPeriod(b,7,.015);if(r==="1M")return genPeriod(b,30,.02);if(r==="3M")return genPeriod(b,90,.025);if(r==="1Y")return genPeriod(b,365,.02);return genPeriod(b,1825,.018);}
+function getMockD(b,r){if(r==="1D")return genDay(b);if(r==="1W")return genPeriod(b,7,.015);if(r==="1M")return genPeriod(b,30,.02);if(r==="3M")return genPeriod(b,90,.025);if(r==="1Y")return genPeriod(b,365,.02);return genPeriod(b,1825,.018);}
+function getCachedD(symbol,r){
+  if(chartCache[symbol]&&chartCache[symbol][r]&&chartCache[symbol][r].data.length>2)return chartCache[symbol][r].data;
+  if(r==="1D"&&sparkCache[symbol]&&sparkCache[symbol].length>2&&connState==="live")return sparkCache[symbol];
+  return null;
+}
 
 var prices={};STOCKS.forEach(function(s){prices[s.symbol]=s.price;});
 var sparkCache={};STOCKS.forEach(function(s){sparkCache[s.symbol]=genPeriod(s.price,20,.015);});
@@ -255,10 +302,10 @@ function sparkSVG(data,color,w,h){
   return '<svg width="'+w+'" height="'+h+'" viewBox="0 0 '+w+" "+h+'"><defs><linearGradient id="'+gid+'" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="'+color+'" stop-opacity=".3"/><stop offset="100%" stop-color="'+color+'" stop-opacity="0"/></linearGradient></defs><polygon points="'+pts+" "+w+","+h+" 0,"+h+'" fill="url(#'+gid+')"/><polyline points="'+pts+'" fill="none" stroke="'+color+'" stroke-width="1.5"/></svg>';
 }
 
-function drawMain(){
+function renderChart(data){
   var el=document.getElementById("chart-main");if(!el)return;
   var rect=el.getBoundingClientRect(),W=rect.width,H=rect.height;if(W<10||H<10)return;
-  var data=getD(sel.price,rng);
+  if(!data||data.length<2)return;
   var isUp=sel.change>=0,color=isUp?"#64dcb4":"#ff6b8a";
   var pL=60,pR=16,pT=16,pB=30,cW=W-pL-pR,cH=H-pT-pB;
   var ps=data.map(function(d){return d.p;}),mn=Math.min.apply(null,ps),mx=Math.max.apply(null,ps),r=mx-mn||1;
@@ -284,6 +331,24 @@ function drawMain(){
   var bw=Math.max(1,(cW/data.length)*.7),bars="";
   data.forEach(function(d,i){var x=pL+(i/(data.length-1))*cW-bw/2,bh=(d.v/vmx)*(vH-8);bars+='<rect x="'+x+'" y="'+(vH-bh)+'" width="'+bw+'" height="'+bh+'" rx="2" fill="'+color+'" opacity=".15"/>';});
   ve.innerHTML='<svg width="100%" height="100%" viewBox="0 0 '+vW+" "+vH+'" style="display:block">'+bars+"</svg>";
+}
+
+function drawMain(){
+  var symbol=sel.symbol;
+  // Try cached data first for instant render
+  var cached=getCachedD(symbol,rng);
+  if(cached){renderChart(cached);}
+  // If live, fetch fresh data
+  if(connState!=="offline"){
+    fetchChartData(symbol,rng).then(function(data){
+      if(sel.symbol===symbol&&data&&data.length>2){renderChart(data);}
+    }).catch(function(){
+      // If no cached data, fallback to mock
+      if(!cached){renderChart(getMockD(prices[symbol],rng));}
+    });
+  }else if(!cached){
+    renderChart(getMockD(prices[symbol],rng));
+  }
 }
 
 function render(){
