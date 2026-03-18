@@ -63,6 +63,11 @@ body{background:#0a0a14;color:#c8c8d8;font-family:'Outfit',sans-serif;overflow-x
 
 .tip{position:fixed;background:rgba(15,15,25,.95);border:1px solid rgba(100,220,180,.3);border-radius:6px;padding:6px 10px;font-family:'JetBrains Mono',monospace;font-size:11px;color:#64dcb4;font-weight:600;pointer-events:none;display:none;z-index:100}
 
+.conn-status{font-size:9px;font-weight:500;padding:2px 6px;border-radius:4px;letter-spacing:.5px;margin-left:6px}
+.conn-live{color:#64dcb4;background:rgba(100,220,180,.1)}
+.conn-loading{color:#f0c040;background:rgba(240,192,64,.1)}
+.conn-offline{color:#ff6b8a;background:rgba(255,107,138,.1)}
+
 @media(max-width:1000px){
   .main{flex-direction:column;height:auto}
   .left,.right{width:100%;max-height:35vh;border:none;border-bottom:1px solid rgba(255,255,255,.04)}
@@ -92,6 +97,7 @@ var STOCKS=[
 {symbol:"JPM",name:"JPMorgan Chase",price:198.35,change:1.45,changePct:0.74,volume:"8.7M",marketCap:"571B",pe:11.8,high52:212.78,low52:165.20,sector:"Finance"}
 ];
 var INDICES=[{name:"S&P 500",value:"5,234.18",change:"+0.85%",up:true},{name:"NASDAQ",value:"16,428.82",change:"+1.12%",up:true},{name:"DOW",value:"39,512.84",change:"-0.23%",up:false},{name:"VIX",value:"14.32",change:"-3.45%",up:true}];
+var INDEX_SYMBOLS={"S&P 500":"^GSPC","NASDAQ":"^IXIC","DOW":"^DJI","VIX":"^VIX"};
 var NEWS=[
 {time:"2분 전",headline:"Fed, Q2 금리 인하 시사...인플레이션 냉각 중",sentiment:"positive"},
 {time:"15분 전",headline:"NVIDIA, 차세대 AI 칩 발표...성능 3배 향상",sentiment:"positive"},
@@ -102,9 +108,140 @@ var NEWS=[
 ];
 var SENT={positive:{l:"● 호재",c:"#64dcb4"},negative:{l:"● 악재",c:"#ff6b8a"},neutral:{l:"● 중립",c:"#666"}};
 
+// --- Yahoo Finance API (no auth required) ---
+var CORS_PROXIES=[
+  "https://corsproxy.io/?url=",
+  "https://api.allorigins.win/raw?url="
+];
+var activeProxy=0;
+var connState="loading"; // "live","loading","offline"
+var lastUpdate=null;
+
+function fmtNum(n){
+  if(n>=1e12)return(n/1e12).toFixed(2)+"T";
+  if(n>=1e9)return(n/1e9).toFixed(2)+"B";
+  if(n>=1e6)return(n/1e6).toFixed(1)+"M";
+  return n.toLocaleString();
+}
+
+function yahooUrl(symbol){
+  return "https://query1.finance.yahoo.com/v8/finance/chart/"+encodeURIComponent(symbol)+"?interval=1m&range=1d&includePrePost=false";
+}
+
+function fetchWithProxy(url){
+  var proxy=CORS_PROXIES[activeProxy];
+  return fetch(proxy+encodeURIComponent(url)).then(function(r){
+    if(!r.ok)throw new Error("HTTP "+r.status);
+    return r.json();
+  });
+}
+
+function fetchQuote(symbol){
+  return fetchWithProxy(yahooUrl(symbol)).then(function(data){
+    var result=data.chart.result[0];
+    var meta=result.meta;
+    var q={
+      price:meta.regularMarketPrice,
+      prevClose:meta.chartPreviousClose||meta.previousClose,
+      high:meta.regularMarketDayHigh||meta.regularMarketPrice,
+      low:meta.regularMarketDayLow||meta.regularMarketPrice,
+      volume:meta.regularMarketVolume||0
+    };
+    q.change=+(q.price-q.prevClose).toFixed(2);
+    q.changePct=+((q.change/q.prevClose)*100).toFixed(2);
+    // Extract intraday prices for sparkline
+    var timestamps=result.timestamp||[];
+    var closes=(result.indicators.quote[0].close)||[];
+    var volumes=(result.indicators.quote[0].volume)||[];
+    var intraday=[];
+    for(var i=0;i<timestamps.length;i++){
+      if(closes[i]!=null){
+        var dt=new Date(timestamps[i]*1000);
+        var hh=dt.getHours(),mm=dt.getMinutes();
+        intraday.push({l:hh+":"+String(mm).padStart(2,"0"),p:+closes[i].toFixed(2),v:volumes[i]||0});
+      }
+    }
+    q.intraday=intraday;
+    return q;
+  });
+}
+
+function fetchAllQuotes(){
+  connState="loading";
+  updateConnBadge();
+  var symbols=STOCKS.map(function(s){return s.symbol;});
+  var promises=symbols.map(function(sym){
+    return fetchQuote(sym).then(function(q){return{symbol:sym,quote:q,ok:true};}).catch(function(){return{symbol:sym,ok:false};});
+  });
+  Promise.all(promises).then(function(results){
+    var anyOk=false;
+    results.forEach(function(r){
+      if(!r.ok)return;
+      anyOk=true;
+      var stock=STOCKS.find(function(s){return s.symbol===r.symbol;});
+      if(!stock)return;
+      prices[r.symbol]=r.quote.price;
+      stock.change=r.quote.change;
+      stock.changePct=r.quote.changePct;
+      stock.volume=fmtNum(r.quote.volume);
+      stock.dayHigh=r.quote.high;
+      stock.dayLow=r.quote.low;
+      if(r.quote.intraday.length>2){
+        sparkCache[r.symbol]=r.quote.intraday;
+      }
+    });
+    if(anyOk){
+      connState="live";
+      lastUpdate=new Date();
+    }else{
+      // Try next proxy
+      if(activeProxy<CORS_PROXIES.length-1){
+        activeProxy++;
+        fetchAllQuotes();
+        return;
+      }
+      connState="offline";
+    }
+    updateConnBadge();
+    render();
+    setTimeout(drawMain,50);
+  });
+}
+
+// Fetch index data
+function fetchIndices(){
+  var indexEntries=INDICES.map(function(idx){return{name:idx.name,symbol:INDEX_SYMBOLS[idx.name]};});
+  indexEntries.forEach(function(entry){
+    fetchQuote(entry.symbol).then(function(q){
+      var idx=INDICES.find(function(i){return i.name===entry.name;});
+      if(!idx)return;
+      idx.value=q.price.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+      idx.change=(q.changePct>=0?"+":"")+q.changePct.toFixed(2)+"%";
+      idx.up=q.changePct>=0;
+    }).catch(function(){});
+  });
+}
+
+function updateConnBadge(){
+  var el=document.getElementById("conn-badge");
+  if(!el)return;
+  if(connState==="live"){
+    el.className="conn-status conn-live";
+    el.textContent="LIVE";
+    if(lastUpdate){el.title="마지막 업데이트: "+lastUpdate.toLocaleTimeString();}
+  }else if(connState==="loading"){
+    el.className="conn-status conn-loading";
+    el.textContent="연결 중...";
+  }else{
+    el.className="conn-status conn-offline";
+    el.textContent="MOCK";
+    el.title="API 연결 실패 - mock 데이터 사용 중";
+  }
+}
+
 function genDay(b){var d=[],p=b*.998;for(var i=0;i<78;i++){p*=1+(Math.random()-.49)*.004;var h=9+Math.floor((i*5)/60),m=(i*5)%60;d.push({l:h+":"+String(m).padStart(2,"0"),p:+p.toFixed(2),v:Math.floor(Math.random()*100+10)});}return d;}
 function genPeriod(b,n,vol){var d=[],p=b*(.85+Math.random()*.1);for(var i=0;i<n;i++){p*=1+(Math.random()-.48)*(vol||.02);d.push({l:"",p:+p.toFixed(2),v:Math.floor(Math.random()*80+20)});}return d;}
-function getD(b,r){if(r==="1D")return genDay(b);if(r==="1W")return genPeriod(b,7,.015);if(r==="1M")return genPeriod(b,30,.02);if(r==="3M")return genPeriod(b,90,.025);if(r==="1Y")return genPeriod(b,365,.02);return genPeriod(b,1825,.018);}
+function getD(b,r){if(r==="1D")return sparkCache[sel.symbol]&&sparkCache[sel.symbol].length>2&&connState==="live"?sparkCache[sel.symbol]:genDay(b);if(r==="1W")return genPeriod(b,7,.015);if(r==="1M")return genPeriod(b,30,.02);if(r==="3M")return genPeriod(b,90,.025);if(r==="1Y")return genPeriod(b,365,.02);return genPeriod(b,1825,.018);}
 
 var prices={};STOCKS.forEach(function(s){prices[s.symbol]=s.price;});
 var sparkCache={};STOCKS.forEach(function(s){sparkCache[s.symbol]=genPeriod(s.price,20,.015);});
@@ -160,7 +297,7 @@ function render(){
   h+='</div></div>';
 
   // Header
-  h+='<div class="header"><div style="display:flex;align-items:center;gap:12px"><div class="logo">₩</div><span style="font-size:16px;font-weight:600;color:#fff;letter-spacing:-.5px">StockPulse</span><span class="live-badge">LIVE</span></div><div class="clock"><div class="clock-dot"></div><span id="clk">'+new Date().toLocaleTimeString()+" KST</span></div></div>";
+  h+='<div class="header"><div style="display:flex;align-items:center;gap:12px"><div class="logo">₩</div><span style="font-size:16px;font-weight:600;color:#fff;letter-spacing:-.5px">StockPulse</span><span class="live-badge">LIVE</span><span id="conn-badge" class="conn-status conn-loading">연결 중...</span></div><div class="clock"><div class="clock-dot"></div><span id="clk">'+new Date().toLocaleTimeString()+" KST</span></div></div>";
 
   // Main
   h+='<div class="main">';
@@ -211,12 +348,22 @@ function render(){
   document.getElementById("app").innerHTML=h;
 }
 
-// Price ticker
+// Mock price ticker (fallback when API offline)
 setInterval(function(){
+  if(connState==="live")return; // skip mock updates when live
   STOCKS.forEach(function(s){prices[s.symbol]=+(prices[s.symbol]*(1+(Math.random()-.5)*.002)).toFixed(2);});
   var el=document.getElementById("pbig");
   if(el)el.textContent="$"+prices[sel.symbol].toFixed(2);
 },2000);
+
+// Live price polling (every 10 seconds)
+var POLL_INTERVAL=10000;
+setInterval(function(){
+  if(connState!=="offline"){
+    fetchAllQuotes();
+    fetchIndices();
+  }
+},POLL_INTERVAL);
 
 // Clock
 setInterval(function(){var el=document.getElementById("clk");if(el)el.textContent=new Date().toLocaleTimeString()+" KST";},1000);
@@ -225,6 +372,10 @@ setInterval(function(){var el=document.getElementById("clk");if(el)el.textConten
 render();
 setTimeout(drawMain,100);
 window.addEventListener("resize",function(){drawMain();});
+
+// Fetch real data on load
+fetchAllQuotes();
+fetchIndices();
 </script>
 </body>
 </html>
