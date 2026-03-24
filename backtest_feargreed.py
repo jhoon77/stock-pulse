@@ -6,111 +6,76 @@ Stock Pulse - 공포탐욕지수 기반 QQQ 분할매매 백테스트
   - Extreme Fear (0~25) 진입 시 → 3일간 1/3씩 매수
   - Extreme Greed (75~100) 진입 시 → 3일간 1/3씩 매도
   - 초기자본: $100,000 / 기간: 2023~2025
+
+데이터 소스:
+  - F&G 2023: GitHub whit3rabbit/fear-greed-data (실제 CNN F&G 일별 데이터)
+  - F&G 2024~2025: 주요 시장 이벤트 기반 복원 (2024-08 일본발 폭락, 2024-12 Fed,
+    2025-03~04 관세 쇼크 F&G=3 등)
+  - QQQ 가격: 실제 월말 종가 기준 일봉 보간
 """
 
+import os
 import numpy as np
 import pandas as pd
 from tabulate import tabulate
 from datetime import datetime
 
-
-# ─── 데이터 생성 (2023~2025 QQQ + Fear & Greed Index) ────────────────────────
-
-def generate_qqq_data() -> pd.DataFrame:
-    """2023~2025 QQQ 실제 흐름을 반영한 시뮬레이션 데이터 생성.
-
-    주요 시장 이벤트 반영:
-    - 2023 초: 약세장 회복기 (QQQ ~270)
-    - 2023 중~말: AI 랠리 (QQQ ~390)
-    - 2024 초: 조정 후 재상승
-    - 2024 중: 사상 최고치 (QQQ ~500+)
-    - 2024 8월: VIX 급등 조정 (일본 금리)
-    - 2024 말~2025: 변동성 속 횡보/상승
-    """
-    np.random.seed(42)
-    dates = pd.bdate_range(start="2023-01-03", end="2025-12-31")
-
-    # 구간별 추세 설정 (일일 수익률 평균, 변동성)
-    segments = [
-        ("2023-01-03", "2023-03-15", -0.0002, 0.015),   # 초반 약세
-        ("2023-03-16", "2023-06-30",  0.0015, 0.012),   # 회복 랠리
-        ("2023-07-01", "2023-10-31",  0.0003, 0.013),   # 횡보
-        ("2023-11-01", "2023-12-31",  0.0018, 0.010),   # 연말 랠리
-        ("2024-01-01", "2024-03-31",  0.0012, 0.011),   # AI 모멘텀
-        ("2024-04-01", "2024-06-30",  0.0008, 0.014),   # 조정 후 상승
-        ("2024-07-01", "2024-07-31",  0.0015, 0.010),   # 사상 최고
-        ("2024-08-01", "2024-08-15", -0.0030, 0.025),   # 8월 폭락
-        ("2024-08-16", "2024-09-30",  0.0015, 0.015),   # 반등
-        ("2024-10-01", "2024-12-31",  0.0010, 0.013),   # 연말 상승
-        ("2025-01-01", "2025-03-31",  0.0005, 0.016),   # 변동성
-        ("2025-04-01", "2025-06-30", -0.0005, 0.018),   # 조정
-        ("2025-07-01", "2025-09-30",  0.0010, 0.014),   # 회복
-        ("2025-10-01", "2025-12-31",  0.0008, 0.012),   # 연말
-    ]
-
-    start_price = 270.0  # 2023년 초 QQQ 가격
-    prices = []
-    price = start_price
-
-    for date in dates:
-        date_str = date.strftime("%Y-%m-%d")
-        mu, sigma = 0.0003, 0.015  # default
-        for seg_start, seg_end, seg_mu, seg_sigma in segments:
-            if seg_start <= date_str <= seg_end:
-                mu, sigma = seg_mu, seg_sigma
-                break
-        ret = np.random.normal(mu, sigma)
-        price *= (1 + ret)
-        prices.append(price)
-
-    prices = np.array(prices)
-    df = pd.DataFrame({
-        "date": dates[:len(prices)],
-        "close": prices,
-        "open": prices * (1 + np.random.uniform(-0.003, 0.003, len(prices))),
-        "high": prices * (1 + np.abs(np.random.normal(0, 0.008, len(prices)))),
-        "low": prices * (1 - np.abs(np.random.normal(0, 0.008, len(prices)))),
-    })
-    return df
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+DATA_DIR = os.path.join(SCRIPT_DIR, "data")
 
 
-def generate_fear_greed(df: pd.DataFrame) -> pd.Series:
-    """QQQ 가격 데이터 기반 시뮬레이션 공포탐욕지수 생성.
+# ─── 실제 데이터 로드 ─────────────────────────────────────────────────────────
 
-    실제 CNN Fear & Greed Index와 유사하게:
-    - 급락 시 → Extreme Fear (0~25)
-    - 급등 시 → Extreme Greed (75~100)
-    - 이동평균 대비 위치, 변동성, 모멘텀 반영
-    """
-    close = df["close"]
+def load_fear_greed() -> pd.DataFrame:
+    """CSV 파일에서 Fear & Greed Index 일별 데이터를 로드합니다."""
+    fg_2023 = pd.read_csv(os.path.join(DATA_DIR, "fear_greed_2023.csv"))
+    fg_2024_2025 = pd.read_csv(os.path.join(DATA_DIR, "fear_greed_2024_2025.csv"))
+    fg = pd.concat([fg_2023, fg_2024_2025], ignore_index=True)
+    fg["date"] = pd.to_datetime(fg["date"])
+    fg = fg.sort_values("date").reset_index(drop=True)
+    return fg
 
-    # 1) 20일 수익률 모멘텀 → 0~100 스케일
-    mom_20 = close.pct_change(20).fillna(0)
-    mom_score = (mom_20 - mom_20.min()) / (mom_20.max() - mom_20.min()) * 100
 
-    # 2) 가격 vs 125일 이동평균
-    sma125 = close.rolling(125).mean()
-    dist = ((close - sma125) / sma125).fillna(0)
-    dist_score = (dist - dist.min()) / (dist.max() - dist.min()) * 100
+def load_qqq_prices() -> pd.DataFrame:
+    """월말 종가 기준 QQQ 데이터를 로드하고 일봉으로 보간합니다."""
+    monthly = pd.read_csv(os.path.join(DATA_DIR, "qqq_monthly.csv"))
+    monthly["date"] = pd.to_datetime(monthly["date"])
+    monthly = monthly.sort_values("date").reset_index(drop=True)
 
-    # 3) 변동성 (높을수록 공포)
-    vol = close.pct_change().rolling(20).std().fillna(0)
-    vol_score = 100 - (vol - vol.min()) / (vol.max() - vol.min()) * 100
+    # 영업일 기준 일별 데이터 생성
+    all_dates = pd.bdate_range(
+        start=monthly["date"].iloc[0],
+        end=monthly["date"].iloc[-1],
+    )
 
-    # 4) 52주 고점 대비
-    high_52 = close.rolling(252, min_periods=1).max()
-    from_high = (close / high_52)
-    high_score = (from_high - from_high.min()) / (from_high.max() - from_high.min()) * 100
+    daily = pd.DataFrame({"date": all_dates})
+    daily = daily.merge(monthly, on="date", how="left")
 
-    # 가중 합산
-    raw = mom_score * 0.30 + dist_score * 0.25 + vol_score * 0.25 + high_score * 0.20
+    # 선형 보간
+    daily["close"] = daily["close"].interpolate(method="linear")
+    # 첫 행 NaN 처리
+    daily["close"] = daily["close"].ffill().bfill()
 
-    # 스무딩 + 노이즈
-    fg = raw.rolling(5, min_periods=1).mean()
-    noise = np.random.normal(0, 3, len(fg))
-    fg = np.clip(fg + noise, 0, 100)
+    # 2023-01-03 이후만
+    daily = daily[daily["date"] >= "2023-01-03"].reset_index(drop=True)
 
-    return pd.Series(fg, index=df.index)
+    return daily
+
+
+def build_dataset() -> tuple[pd.DataFrame, pd.Series]:
+    """QQQ 가격과 F&G 지수를 매칭하여 데이터셋을 구성합니다."""
+    qqq = load_qqq_prices()
+    fg_df = load_fear_greed()
+
+    # 날짜 기준 병합
+    merged = qqq.merge(fg_df, on="date", how="inner")
+    merged = merged.sort_values("date").reset_index(drop=True)
+
+    fg_series = merged["value"].astype(float)
+
+    df = merged[["date", "close"]].copy()
+
+    return df, fg_series
 
 
 # ─── 백테스트 엔진 ────────────────────────────────────────────────────────────
@@ -130,11 +95,11 @@ def run_fear_greed_backtest(
     trades = []
 
     # 분할매매 큐
-    buy_queue = []   # (날짜, 금액) — 남은 매수 분할
-    sell_queue = []  # (날짜, 비율) — 남은 매도 분할
+    buy_queue = []   # 남은 매수 분할 금액
+    sell_queue = []  # 남은 매도 분할 수량
 
-    prev_fg_zone = "neutral"  # 이전 공포탐욕 구간
-    total_invested = 0.0      # 총 매수 금액 (평단가 계산용)
+    prev_fg_zone = "neutral"
+    total_invested = 0.0
 
     daily_log = []
 
@@ -153,14 +118,14 @@ def run_fear_greed_backtest(
 
         # ── Extreme Fear 진입 시: 3일 분할매수 예약 ──
         if fg_zone == "EXTREME FEAR" and prev_fg_zone != "EXTREME FEAR":
-            if capital > 100:  # 매수 가능한 자금이 있을 때만
+            if capital > 100 and not buy_queue:  # 이미 매수 진행 중이 아닐 때
                 buy_amount_per_day = capital / split_days
                 for d in range(split_days):
                     buy_queue.append(buy_amount_per_day)
                 trades.append({
                     "date": date.strftime("%Y-%m-%d"),
                     "type": "SIGNAL",
-                    "action": f"극단적 공포 감지 (F&G={fg_val:.0f}) → 3일 분할매수 시작",
+                    "action": f"극단적 공포 감지 (F&G={fg_val:.0f}) -> 3일 분할매수 시작",
                     "price": price,
                     "shares": 0,
                     "amount": 0,
@@ -170,7 +135,7 @@ def run_fear_greed_backtest(
 
         # ── Extreme Greed 진입 시: 3일 분할매도 예약 ──
         if fg_zone == "EXTREME GREED" and prev_fg_zone != "EXTREME GREED":
-            if shares > 0:
+            if shares > 0 and not sell_queue:  # 이미 매도 진행 중이 아닐 때
                 sell_shares_per_day = shares // split_days
                 remainder = shares - sell_shares_per_day * split_days
                 for d in range(split_days):
@@ -179,7 +144,7 @@ def run_fear_greed_backtest(
                 trades.append({
                     "date": date.strftime("%Y-%m-%d"),
                     "type": "SIGNAL",
-                    "action": f"극단적 탐욕 감지 (F&G={fg_val:.0f}) → 3일 분할매도 시작",
+                    "action": f"극단적 탐욕 감지 (F&G={fg_val:.0f}) -> 3일 분할매도 시작",
                     "price": price,
                     "shares": 0,
                     "amount": 0,
@@ -201,7 +166,7 @@ def run_fear_greed_backtest(
                     "date": date.strftime("%Y-%m-%d"),
                     "type": "BUY",
                     "action": f"분할매수 ({split_days - len(buy_queue)}/{split_days})",
-                    "price": price,
+                    "price": round(price, 2),
                     "shares": buy_shares,
                     "amount": round(cost, 2),
                     "capital": round(capital, 2),
@@ -226,7 +191,7 @@ def run_fear_greed_backtest(
                     "date": date.strftime("%Y-%m-%d"),
                     "type": "SELL",
                     "action": f"분할매도 ({split_days - len(sell_queue)}/{split_days})",
-                    "price": price,
+                    "price": round(price, 2),
                     "shares": sell_shares,
                     "amount": round(revenue, 2),
                     "capital": round(capital, 2),
@@ -295,15 +260,16 @@ def run_fear_greed_backtest(
 
 # ─── 출력 ─────────────────────────────────────────────────────────────────────
 
-def print_report(result: dict):
+def print_report(result: dict, data_source: str):
     print()
-    print("=" * 70)
+    print("=" * 72)
     print("  STOCK PULSE - 공포탐욕지수 분할매매 백테스트")
-    print("=" * 70)
+    print("=" * 72)
     print("  종목: QQQ (Invesco QQQ Trust)")
-    print("  전략: Extreme Fear → 3일 1/3 분할매수 | Extreme Greed → 3일 1/3 분할매도")
-    print("  기간: 2023-01-03 ~ 2025-12-31  |  데이터: 시뮬레이션")
-    print("-" * 70)
+    print("  전략: Extreme Fear -> 3일 1/3 분할매수 | Extreme Greed -> 3일 1/3 분할매도")
+    print(f"  기간: 2023-01-03 ~ 2025-12-31")
+    print(f"  데이터: {data_source}")
+    print("-" * 72)
 
     summary = [
         ["초기 자본", f"${result['initial_capital']:>14,.2f}"],
@@ -333,15 +299,15 @@ def print_report(result: dict):
     print(tabulate(summary, tablefmt="simple", colalign=("left", "right")))
 
     # 거래 내역
-    print("\n" + "-" * 70)
+    print("\n" + "-" * 72)
     print("  거래 내역")
-    print("-" * 70)
+    print("-" * 72)
 
     trade_rows = []
     for t in result["trades"]:
         if t["type"] == "SIGNAL":
             trade_rows.append([
-                t["date"], "📡", t["action"], "", "", "",
+                t["date"], ">>", t["action"], "", "", "",
                 f"{t['total_shares']}주"
             ])
         elif t["type"] == "BUY":
@@ -355,13 +321,13 @@ def print_report(result: dict):
             ])
         elif t["type"] == "SELL":
             pnl = t.get("pnl", 0)
-            pnl_str = f"${pnl:+,.2f}"
+            pnl_marker = "+" if pnl >= 0 else ""
             trade_rows.append([
                 t["date"], "SELL",
                 t["action"],
                 f"${t['price']:.2f}",
                 f"{t['shares']}주",
-                f"+${t['amount']:,.2f}",
+                f"+${t['amount']:,.2f} (P&L {pnl_marker}${pnl:,.2f})",
                 f"{t['total_shares']}주"
             ])
 
@@ -373,11 +339,11 @@ def print_report(result: dict):
     ))
 
     # 연도별 수익률
-    print("\n" + "-" * 70)
+    print("\n" + "-" * 72)
     print("  연도별 성과")
-    print("-" * 70)
+    print("-" * 72)
 
-    daily = result["daily_df"]
+    daily = result["daily_df"].copy()
     daily["year"] = daily["date"].dt.year
     yearly_rows = []
     for year in sorted(daily["year"].unique()):
@@ -407,9 +373,9 @@ def print_report(result: dict):
     ))
 
     # F&G 구간별 분포
-    print("\n" + "-" * 70)
+    print("\n" + "-" * 72)
     print("  공포탐욕지수 분포")
-    print("-" * 70)
+    print("-" * 72)
 
     fg = daily["fg"]
     zones = [
@@ -428,18 +394,29 @@ def print_report(result: dict):
 
     print(tabulate(zone_rows, tablefmt="simple", colalign=("left", "right", "right", "left")))
 
-    print("\n" + "=" * 70)
+    print("\n" + "=" * 72)
 
 
 # ─── 메인 ─────────────────────────────────────────────────────────────────────
 
 if __name__ == "__main__":
-    print("\n  QQQ + 공포탐욕지수 데이터 생성 중...")
-    df = generate_qqq_data()
-    fg = generate_fear_greed(df)
+    data_source = (
+        "F&G 2023: CNN 실제 데이터 (GitHub) | "
+        "F&G 2024-25: 주요 이벤트 기반 복원 | "
+        "QQQ: 실제 월말 종가 보간"
+    )
+
+    print("\n  실제 데이터 로드 중...")
+    df, fg = build_dataset()
 
     print(f"  {len(df)}일 데이터 로드 완료", end="")
     print(f" ({df['date'].iloc[0].strftime('%Y-%m-%d')} ~ {df['date'].iloc[-1].strftime('%Y-%m-%d')})")
+    print(f"  QQQ 시작가: ${df['close'].iloc[0]:.2f} -> 종가: ${df['close'].iloc[-1]:.2f}")
+
+    fg_min_idx = fg.idxmin()
+    fg_max_idx = fg.idxmax()
+    print(f"  F&G 최저: {fg.min():.0f} ({df['date'].iloc[fg_min_idx].strftime('%Y-%m-%d')})")
+    print(f"  F&G 최고: {fg.max():.0f} ({df['date'].iloc[fg_max_idx].strftime('%Y-%m-%d')})")
 
     result = run_fear_greed_backtest(df, fg, initial_capital=100_000)
-    print_report(result)
+    print_report(result, data_source)
