@@ -362,7 +362,7 @@ function render(){
   h+='</div></div>';
 
   // Header
-  h+='<div class="header"><div style="display:flex;align-items:center;gap:12px"><div class="logo">₩</div><span style="font-size:16px;font-weight:600;color:#fff;letter-spacing:-.5px">StockPulse</span><span class="live-badge">LIVE</span><span id="conn-badge" class="conn-status conn-loading">연결 중...</span></div><div class="clock"><div class="clock-dot"></div><span id="clk">'+new Date().toLocaleTimeString()+" KST</span></div></div>";
+  h+='<div class="header"><div style="display:flex;align-items:center;gap:12px"><div class="logo">₩</div><span style="font-size:16px;font-weight:600;color:#fff;letter-spacing:-.5px">StockPulse</span><span class="live-badge">LIVE</span><span id="conn-badge" class="conn-status conn-loading">연결 중...</span></div><div style="display:flex;align-items:center;gap:16px"><a href="compare.html" style="font-size:11px;font-family:JetBrains Mono,monospace;color:#666;text-decoration:none">SMH vs SOXX 비교 →</a><div class="clock"><div class="clock-dot"></div><span id="clk">'+new Date().toLocaleTimeString()+" KST</span></div></div></div>";
 
   // Main
   h+='<div class="main">';
