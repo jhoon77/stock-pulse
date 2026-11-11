@@ -1,0 +1,939 @@
+<!doctype html>
+<html lang="ko">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>서학개미 퇴근주</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Gaegu:wght@700&family=Noto+Sans+KR:wght@400;500;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: one 16:9 screening stage under dim hof-house light, a control rail beneath it, then the scene list. Single dark look by choice. */
+:root{
+  --ink:#10121d;
+  --panel:#1a1d2c;
+  --line:#2b2f45;
+  --text:#f3ecdf;
+  --muted:#a7a2b6;
+  --beer:#f2a93b;
+  --down:#4f86ff;
+  --up:#ff5a4f;
+  --display:"Black Han Sans","Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --body:"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --hand:"Gaegu","Noto Sans KR","Apple SD Gothic Neo",cursive;
+  --mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{background:var(--ink)}
+body{margin:0;background:var(--ink);color:var(--text);font-family:var(--body);font-size:15px;line-height:1.6;
+  padding-block:28px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:1120px;margin:0 auto;display:grid;gap:20px}
+.head{display:grid;gap:6px}
+.eyebrow{margin:0;font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--beer)}
+h1{margin:0;font-family:var(--display);font-weight:400;font-size:clamp(34px,6vw,58px);line-height:1.05;text-wrap:balance}
+.lede{margin:0;max-width:62ch;color:var(--muted);text-wrap:pretty}
+.lede .d{color:var(--down)} .lede .b{color:var(--beer)}
+.screen{margin:0;border-radius:14px;overflow:hidden;background:#05060c;border:1px solid var(--line)}
+.stage-wrap{position:relative;cursor:pointer}
+#stage{display:block;width:100%;height:auto;aspect-ratio:16/9;max-width:100%;background:#0b0d18}
+.f-display{font-family:var(--display)} .f-body{font-family:var(--body)} .f-hand{font-family:var(--hand);font-weight:700} .f-mono{font-family:var(--mono)}
+.bigplay{position:absolute;inset:0;margin:auto;width:84px;height:84px;border-radius:50%;border:0;background:var(--beer);color:#1b1206;display:grid;place-items:center;cursor:pointer;box-shadow:0 10px 40px rgba(0,0,0,.5)}
+.bigplay svg{width:34px;height:34px;margin-left:5px}
+.controls{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--panel);border-top:1px solid var(--line)}
+.btn{appearance:none;border:1px solid var(--line);background:#23273a;color:var(--text);height:36px;min-width:36px;padding:0 12px;border-radius:8px;font:500 14px/1 var(--body);display:inline-flex;align-items:center;justify-content:center;gap:6px;cursor:pointer;white-space:nowrap}
+.btn:hover{background:#2c3149}
+.btn svg{width:16px;height:16px;flex:none}
+.btn.primary{background:var(--beer);color:#1b1206;border-color:transparent;min-width:104px}
+.btn.primary:hover{background:#f6b956}
+.btn[aria-pressed="true"]{border-color:var(--beer);color:var(--beer)}
+.btn:focus-visible,.chip:focus-visible,#scrub:focus-visible,.bigplay:focus-visible{outline:2px solid var(--beer);outline-offset:2px}
+#scrub{flex:1;min-width:0;accent-color:var(--beer);height:24px}
+.time{font-family:var(--mono);font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+.chapters{display:flex;flex-wrap:wrap;gap:8px;list-style:none;margin:0;padding:0}
+.chip{appearance:none;border:1px solid var(--line);background:transparent;color:var(--text);border-radius:999px;padding:6px 14px 6px 10px;font:500 13px/1.2 var(--body);display:inline-flex;align-items:center;gap:8px;cursor:pointer}
+.chip:hover{background:#1f2335}
+.chip .t{font-family:var(--mono);font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.chip[aria-current="true"]{background:var(--text);color:var(--ink);border-color:var(--text)}
+.chip[aria-current="true"] .t{color:#5a5570}
+.note{margin:0;color:var(--muted);font-size:13px;display:flex;flex-wrap:wrap;gap:4px 16px}
+.sw{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+@media (max-width:600px){
+  .controls{flex-wrap:wrap}
+  #scrub{order:9;flex-basis:100%}
+  .btn .lbl{display:none}
+  .btn.primary{min-width:44px}
+}
+</style>
+
+<main class="wrap">
+  <header class="head">
+    <p class="eyebrow">Motion graphic · 60s loop</p>
+    <h1>서학개미 퇴근주</h1>
+    <p class="lede">계좌는 <span class="d">파랗고</span> 맥주는 <span class="b">노랗다</span>. 손실 중인 서학개미 두 명이 퇴근 후 을지로 호프집에서 500cc를 부딪히며 서로를 위로하는 밤.</p>
+  </header>
+
+  <figure class="screen">
+    <div class="stage-wrap" id="stageWrap">
+<svg id="stage" viewBox="0 0 1280 720" role="img" aria-labelledby="stageTitle">
+<title id="stageTitle">퇴근 후 호프집에서 맥주를 마시며 서로를 위로하는 두 개미 투자자 애니메이션</title>
+<defs>
+  <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0a0d22"/><stop offset=".7" stop-color="#1c1d3d"/><stop offset="1" stop-color="#352849"/></linearGradient>
+  <linearGradient id="wall" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#28180f"/><stop offset="1" stop-color="#43291c"/></linearGradient>
+  <linearGradient id="beerGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffc85a"/><stop offset="1" stop-color="#d9861c"/></linearGradient>
+  <linearGradient id="doorGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffd58a"/><stop offset="1" stop-color="#f29a3a"/></linearGradient>
+  <linearGradient id="cone" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffd890" stop-opacity=".30"/><stop offset="1" stop-color="#ffd890" stop-opacity="0"/></linearGradient>
+  <linearGradient id="downFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4f86ff" stop-opacity=".38"/><stop offset="1" stop-color="#4f86ff" stop-opacity="0"/></linearGradient>
+  <radialGradient id="warmSpill"><stop offset="0" stop-color="#ffb35c" stop-opacity=".55"/><stop offset="1" stop-color="#ffb35c" stop-opacity="0"/></radialGradient>
+  <radialGradient id="lampGlow"><stop offset="0" stop-color="#ffe2a6" stop-opacity=".8"/><stop offset="1" stop-color="#ffe2a6" stop-opacity="0"/></radialGradient>
+  <filter id="neon" x="-30%" y="-60%" width="160%" height="220%"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  <filter id="blur8" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="9"/></filter>
+  <filter id="blur3" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3"/></filter>
+  <clipPath id="stageClip"><rect width="1280" height="720"/></clipPath>
+  <clipPath id="tickerClip"><rect x="446" y="272" width="388" height="42"/></clipPath>
+  <clipPath id="winClip"><rect x="42" y="252" width="186" height="176"/></clipPath>
+  <clipPath id="tvClip"><rect x="972" y="72" width="236" height="126" rx="4"/></clipPath>
+  <clipPath id="phoneClip"><rect x="512" y="94" width="256" height="532" rx="26"/></clipPath>
+</defs>
+
+<g clip-path="url(#stageClip)">
+<!-- ============ SCENE 1 · CITY ============ -->
+<g id="city">
+  <rect width="1280" height="720" fill="url(#sky)"/>
+  <g id="stars"></g>
+  <circle cx="1130" cy="104" r="34" fill="#f5e6bf"/>
+  <circle cx="1118" cy="96" r="6" fill="#e6d3a3"/><circle cx="1141" cy="115" r="4" fill="#e6d3a3"/>
+  <g id="cityBack"></g>
+  <g id="cityFront"></g>
+  <rect x="430" y="210" width="420" height="430" fill="#232843"/>
+  <rect x="430" y="210" width="420" height="8" fill="#30365a"/>
+  <g id="towerWindows"></g>
+  <rect x="440" y="266" width="400" height="54" rx="4" fill="#07080f" stroke="#30365a" stroke-width="2"/>
+  <g clip-path="url(#tickerClip)"><text id="ticker" class="f-mono" x="850" y="302" font-size="26" font-weight="600"></text></g>
+  <rect x="930" y="370" width="320" height="270" fill="#2a2338"/>
+  <g id="pubWindows"></g>
+  <rect x="930" y="520" width="320" height="120" fill="#3b2216"/>
+  <rect x="950" y="446" width="280" height="60" rx="6" fill="#140d0b" stroke="#4a2c1c" stroke-width="3"/>
+  <text id="pubSign" class="f-display" x="1090" y="491" text-anchor="middle" font-size="40" fill="#ff7a4a" filter="url(#neon)">을지 호프</text>
+  <path d="M930,520 h320 v20 h-320z" fill="#b8402e"/>
+  <path d="M950,520 h20 v20 h-20z M990,520 h20 v20 h-20z M1030,520 h20 v20 h-20z M1070,520 h20 v20 h-20z M1110,520 h20 v20 h-20z M1150,520 h20 v20 h-20z M1190,520 h20 v20 h-20z M1230,520 h20 v20 h-20z" fill="#efe1c8"/>
+  <rect x="946" y="554" width="78" height="66" fill="#f6b55e"/>
+  <rect x="1156" y="554" width="78" height="66" fill="#f6b55e"/>
+  <circle cx="972" cy="606" r="13" fill="#7a4a26"/><circle cx="1000" cy="610" r="11" fill="#7a4a26"/><circle cx="1190" cy="604" r="13" fill="#7a4a26"/>
+  <rect x="1040" y="548" width="100" height="92" fill="url(#doorGrad)"/>
+  <rect x="1040" y="548" width="100" height="92" fill="none" stroke="#24140d" stroke-width="6"/>
+  <ellipse cx="1090" cy="654" rx="200" ry="26" fill="url(#warmSpill)"/>
+  <rect y="640" width="1280" height="80" fill="#0d0f1a"/>
+  <rect y="640" width="1280" height="6" fill="#272b42"/>
+  <rect x="876" y="470" width="8" height="170" fill="#1a1d2e"/>
+  <path d="M868,470 h24 l-4,-14 h-16z" fill="#1a1d2e"/>
+  <circle cx="880" cy="476" r="46" fill="#ffe2a6" opacity=".18" filter="url(#blur8)"/>
+  <circle cx="880" cy="472" r="6" fill="#ffe9be"/>
+  <g id="walkers"></g>
+  <g id="cityFloat"></g>
+  <g id="titleCard">
+    <text class="f-display" x="64" y="132" font-size="88" fill="#f3ecdf">서학개미 퇴근주</text>
+    <text class="f-hand" x="68" y="186" font-size="38" fill="#f2a93b">손실 중인 두 개미의 맥주 한 잔</text>
+  </g>
+</g>
+
+<!-- ============ SCENE 2 · HOF ============ -->
+<g id="pub" display="none">
+  <g id="pubInner">
+  <rect width="1280" height="720" fill="url(#wall)"/>
+  <rect y="430" width="1280" height="290" fill="#25160f"/>
+  <g id="planks"></g>
+  <rect y="424" width="1280" height="10" fill="#5a3826"/>
+
+  <!-- poster -->
+  <g transform="rotate(-2 180 128)">
+    <rect x="70" y="58" width="220" height="142" fill="#ecdfc4"/>
+    <rect x="80" y="68" width="200" height="122" fill="none" stroke="#c9b48e" stroke-width="2"/>
+    <text class="f-hand" x="180" y="116" text-anchor="middle" font-size="40" fill="#2a1a12">개미는</text>
+    <text class="f-hand" x="180" y="164" text-anchor="middle" font-size="40" fill="#2a1a12">오늘도 뚠뚠</text>
+    <circle cx="258" cy="178" r="17" fill="none" stroke="#c8402e" stroke-width="3"/>
+    <text class="f-body" x="258" y="183" text-anchor="middle" font-size="12" font-weight="700" fill="#c8402e">존버</text>
+  </g>
+
+  <!-- neon -->
+  <g id="neonSign">
+    <rect x="420" y="40" width="170" height="110" rx="12" fill="#1a0f0b" stroke="#3b2418" stroke-width="3"/>
+    <text class="f-hand" x="505" y="74" text-anchor="middle" font-size="22" fill="#ffd36b" filter="url(#neon)">生맥주</text>
+    <text id="neonHof" class="f-display" x="505" y="134" text-anchor="middle" font-size="56" fill="#ff6b4a" filter="url(#neon)">호프</text>
+  </g>
+
+  <!-- clock -->
+  <g id="clock">
+    <circle cx="770" cy="100" r="44" fill="#efe6d2" stroke="#6b4226" stroke-width="7"/>
+    <g id="clockTicks"></g>
+    <line id="hourHand" x1="770" y1="100" x2="770" y2="76" stroke="#2a1a12" stroke-width="6" stroke-linecap="round"/>
+    <line id="minHand" x1="770" y1="100" x2="770" y2="66" stroke="#2a1a12" stroke-width="3.5" stroke-linecap="round"/>
+    <circle cx="770" cy="100" r="4" fill="#c8402e"/>
+  </g>
+
+  <!-- TV -->
+  <g id="tv">
+    <rect x="1080" y="40" width="20" height="22" fill="#151726"/>
+    <rect x="960" y="60" width="260" height="150" rx="10" fill="#0d0f18" stroke="#2b2f45" stroke-width="3"/>
+    <rect x="972" y="72" width="236" height="126" rx="4" fill="#0b1430"/>
+    <g clip-path="url(#tvClip)">
+      <g id="tvDown">
+        <text class="f-mono" x="986" y="98" font-size="14" fill="#a7a2b6">NASDAQ</text>
+        <text class="f-body" x="986" y="130" font-size="26" font-weight="700" fill="#4f86ff">▼2.81%</text>
+      </g>
+      <g id="tvLive" opacity="0">
+        <circle id="liveDot" cx="992" cy="93" r="5" fill="#ff5a4f"/>
+        <text class="f-body" x="1004" y="98" font-size="14" font-weight="700" fill="#f3ecdf">LIVE · 미국장 개장</text>
+        <text id="tvVal" class="f-body" x="986" y="130" font-size="26" font-weight="700" fill="#a7a2b6">개장 직후</text>
+      </g>
+      <path id="tvLine" d="" fill="none" stroke="#4f86ff" stroke-width="3" stroke-linejoin="round"/>
+    </g>
+  </g>
+
+  <!-- menu board -->
+  <g>
+    <rect x="1030" y="250" width="236" height="200" rx="6" fill="#6b4226"/>
+    <rect x="1040" y="260" width="216" height="180" rx="3" fill="#1e2a23"/>
+    <text class="f-hand" x="1148" y="292" text-anchor="middle" font-size="26" fill="#e9e4d6">오늘의 메뉴</text>
+    <g class="f-hand" font-size="22" fill="#e9e4d6">
+      <text x="1056" y="328">生맥주</text><text x="1240" y="328" text-anchor="end">4,500</text>
+      <text x="1056" y="360">노가리</text><text x="1240" y="360" text-anchor="end">6,000</text>
+      <text x="1056" y="392">손절</text><text x="1240" y="392" text-anchor="end" fill="#ff8a7a">품절</text>
+      <text x="1056" y="424">물타기</text><text x="1240" y="424" text-anchor="end" fill="#8fb4ff">무한리필</text>
+    </g>
+  </g>
+
+  <!-- window -->
+  <g>
+    <rect x="30" y="240" width="210" height="200" fill="#1c110c"/>
+    <rect x="42" y="252" width="186" height="176" fill="#0e1330"/>
+    <g clip-path="url(#winClip)"><g id="bokeh" filter="url(#blur3)"></g><g id="rain"></g></g>
+    <rect x="132" y="252" width="6" height="176" fill="#1c110c"/>
+    <rect x="42" y="337" width="186" height="6" fill="#1c110c"/>
+    <rect x="24" y="436" width="222" height="10" fill="#5a3826"/>
+  </g>
+
+  <g id="antA" transform="translate(380,560)"></g>
+  <g id="antB" transform="translate(900,560) scale(-1,1)"></g>
+
+  <!-- table -->
+  <rect x="120" y="526" width="1040" height="18" rx="6" fill="#8a5a35"/>
+  <rect x="120" y="526" width="1040" height="4" rx="2" fill="#a4703f"/>
+  <rect x="132" y="542" width="1016" height="48" fill="#5e3a22"/>
+  <rect x="170" y="588" width="30" height="132" fill="#4a2d1a"/>
+  <rect x="1080" y="588" width="30" height="132" fill="#4a2d1a"/>
+  <!-- plate of nogari -->
+  <ellipse cx="640" cy="529" rx="74" ry="12" fill="#e8e1d4"/>
+  <ellipse cx="640" cy="527" rx="60" ry="8" fill="#d7cfbf"/>
+  <g fill="#c99a5b">
+    <rect x="596" y="514" width="48" height="8" rx="4" transform="rotate(-12 620 518)"/>
+    <rect x="622" y="512" width="50" height="8" rx="4" transform="rotate(10 647 516)"/>
+    <rect x="606" y="519" width="46" height="7" rx="3.5" transform="rotate(4 629 522)"/>
+    <rect x="640" y="519" width="44" height="7" rx="3.5" transform="rotate(-6 662 522)"/>
+  </g>
+  <ellipse cx="686" cy="524" rx="14" ry="5" fill="#d9672e"/>
+
+  <g id="phoneA"><ellipse id="glowA" cx="465" cy="512" rx="62" ry="26" fill="#4f86ff" opacity="0" filter="url(#blur8)"/><path d="M430,531 L500,531 L494,523 L436,523 Z" fill="#0c0d14" stroke="#2b2f45" stroke-width="1.5"/><path id="scrA" d="M438,529 L492,529 L488,524.5 L442,524.5 Z" fill="#4f86ff" opacity="0"/></g>
+  <g id="phoneB"><ellipse id="glowB" cx="815" cy="512" rx="62" ry="26" fill="#4f86ff" opacity="0" filter="url(#blur8)"/><path d="M780,531 L850,531 L844,523 L786,523 Z" fill="#0c0d14" stroke="#2b2f45" stroke-width="1.5"/><path id="scrB" d="M788,529 L842,529 L838,524.5 L792,524.5 Z" fill="#4f86ff" opacity="0"/></g>
+
+  <g id="mugA"></g>
+  <g id="mugB"></g>
+
+  <!-- lamp -->
+  <g id="lamp">
+    <polygon points="574,170 706,170 1010,560 270,560" fill="url(#cone)"/>
+    <line x1="640" y1="0" x2="640" y2="122" stroke="#120a07" stroke-width="3"/>
+    <path d="M604,122 L676,122 L708,170 L572,170 Z" fill="#2d4a3e"/>
+    <path d="M604,122 L676,122 L680,128 L600,128 Z" fill="#3c6152"/>
+    <ellipse cx="640" cy="172" rx="22" ry="8" fill="#fff1cf"/>
+    <circle cx="640" cy="176" r="60" fill="url(#lampGlow)"/>
+  </g>
+
+  <g id="pubFloat"></g>
+  <g id="bubbleA"></g>
+  <g id="bubbleB"></g>
+  </g>
+  <rect id="dim" width="1280" height="720" fill="#05060c" opacity="0"/>
+</g>
+
+<!-- ============ OVERLAYS ============ -->
+<g id="phoneCard" transform="translate(0,800)">
+  <rect x="500" y="82" width="280" height="556" rx="36" fill="#05060c" stroke="#3a4060" stroke-width="3"/>
+  <rect x="512" y="94" width="256" height="532" rx="26" fill="#0f1322"/>
+  <g id="card1" clip-path="url(#phoneClip)">
+    <text class="f-mono" x="532" y="121" font-size="13" fill="#f3ecdf">20:12</text>
+    <text class="f-body" x="524" y="164" font-size="15" fill="#a7a2b6">해외주식 · 내 계좌 평가손익</text>
+    <text id="c1pct" class="f-display" x="524" y="228" font-size="60" fill="#4f86ff">0.0%</text>
+    <text id="c1krw" class="f-mono" x="526" y="258" font-size="18" fill="#4f86ff">-₩0</text>
+    <line x1="524" y1="300" x2="756" y2="300" stroke="#a7a2b6" stroke-width="1" stroke-dasharray="4 4" opacity=".6"/>
+    <text class="f-body" x="756" y="293" text-anchor="end" font-size="12" fill="#a7a2b6">내 평단</text>
+    <path id="c1area" d="" fill="url(#downFill)" opacity="0"/>
+    <path id="c1line" d="" fill="none" stroke="#4f86ff" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+    <g id="c1rows" class="f-body" font-size="15">
+      <g opacity="0"><text x="524" y="464" fill="#f3ecdf">나스닥 3배 레버리지</text><text x="756" y="464" text-anchor="end" fill="#4f86ff" font-weight="700">-61.4%</text></g>
+      <g opacity="0"><text x="524" y="502" fill="#f3ecdf">빅테크 성장주</text><text x="756" y="502" text-anchor="end" fill="#4f86ff" font-weight="700">-22.7%</text></g>
+      <g opacity="0"><text x="524" y="540" fill="#f3ecdf">환율 효과</text><text x="756" y="540" text-anchor="end" fill="#ff5a4f" font-weight="700">+8.9%</text></g>
+    </g>
+    <rect x="524" y="568" width="232" height="40" rx="10" fill="#22283f"/>
+    <text class="f-body" x="640" y="594" text-anchor="middle" font-size="15" font-weight="500" fill="#f3ecdf">못 본 척하기</text>
+  </g>
+  <g id="card2" clip-path="url(#phoneClip)" display="none">
+    <text class="f-mono" x="532" y="121" font-size="13" fill="#f3ecdf">23:31</text>
+    <text class="f-body" x="524" y="164" font-size="15" fill="#a7a2b6">미국 정규장 · 실시간</text>
+    <text id="c2pct" class="f-display" x="524" y="228" font-size="60" fill="#4f86ff">-0.12%</text>
+    <text id="c2sub" class="f-hand" x="526" y="262" font-size="24" fill="#ff8a7a" opacity="0">오늘 처음 보는 빨간색</text>
+    <g stroke="#2b2f45" stroke-width="1"><line x1="524" y1="320" x2="756" y2="320"/><line x1="524" y1="380" x2="756" y2="380"/><line x1="524" y1="440" x2="756" y2="440"/><line x1="524" y1="500" x2="756" y2="500"/></g>
+    <g id="candles"></g>
+    <rect x="524" y="568" width="232" height="40" rx="10" fill="#f2a93b"/>
+    <text class="f-body" x="640" y="594" text-anchor="middle" font-size="15" font-weight="700" fill="#1b1206">한 잔 더</text>
+  </g>
+  <rect x="600" y="104" width="80" height="22" rx="11" fill="#05060c"/>
+</g>
+
+<g id="burst" display="none">
+  <g id="speedLines" stroke="#fff3d6" stroke-width="5" stroke-linecap="round"></g>
+  <g id="drops"></g>
+  <text id="zzan" class="f-display" x="640" y="236" text-anchor="middle" font-size="116" fill="#fff3d6" stroke="#d9861c" stroke-width="7" paint-order="stroke">짠!</text>
+</g>
+
+<g id="notif" transform="translate(640,-140)">
+  <rect x="-300" y="6" width="600" height="88" rx="20" fill="#000" opacity=".35"/>
+  <rect x="-300" y="0" width="600" height="88" rx="20" fill="#f3ecdf"/>
+  <rect x="-282" y="17" width="54" height="54" rx="14" fill="#ff5a4f"/>
+  <path d="M-255,30 c-9,0 -14,7 -14,16 v9 l-5,6 h38 l-5,-6 v-9 c0,-9 -5,-16 -14,-16z M-260,64 a5,5 0 0,0 10,0z" fill="#fff"/>
+  <text class="f-body" x="-212" y="40" font-size="19" font-weight="700" fill="#1a1626">미국 증시 정규장 개장</text>
+  <text class="f-body" x="-212" y="68" font-size="16" fill="#4a4458">오늘은 빨간불일까요? 지금 확인해 보세요.</text>
+  <text class="f-body" x="282" y="40" text-anchor="end" font-size="14" fill="#7a7488">지금</text>
+</g>
+
+<g id="caption" opacity="0">
+  <rect id="capBg" x="40" y="652" width="10" height="42" rx="8" fill="#05060c" fill-opacity=".75"/>
+  <text id="capText" class="f-body" x="58" y="680" font-size="19" font-weight="500" fill="#f3ecdf"></text>
+</g>
+
+<g id="endcard" display="none">
+  <rect width="1280" height="720" fill="#10121d" opacity=".96"/>
+  <g transform="translate(640,300)">
+    <g id="em1"></g><g id="em2"></g>
+    <g id="emSpark" stroke="#fff3d6" stroke-width="4" stroke-linecap="round" opacity="0">
+      <line x1="0" y1="-92" x2="0" y2="-112"/><line x1="-22" y1="-84" x2="-36" y2="-100"/><line x1="22" y1="-84" x2="36" y2="-100"/>
+    </g>
+  </g>
+  <text id="end1" class="f-body" x="640" y="356" text-anchor="middle" font-size="16" font-weight="500" letter-spacing="6" fill="#a7a2b6">서학개미 퇴근주</text>
+  <text id="end2" class="f-display" x="640" y="426" text-anchor="middle" font-size="56" fill="#f3ecdf">오늘도 버틴 모든 개미들에게</text>
+  <text id="end3" class="f-hand" x="640" y="490" text-anchor="middle" font-size="48" fill="#f2a93b">수고했어요. 짠.</text>
+  <text id="end4" class="f-body" x="640" y="646" text-anchor="middle" font-size="15" fill="#7d7890">※ 투자 권유가 아닙니다 · 음주는 적당히</text>
+</g>
+
+<rect id="fade" width="1280" height="720" fill="#000" opacity="0" pointer-events="none"/>
+</g>
+</svg>
+      <button class="bigplay" id="bigplay" type="button" aria-label="재생" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4l14 8-14 8z" fill="currentColor"/></svg></button>
+    </div>
+    <figcaption class="controls">
+      <button class="btn primary" id="play" type="button"></button>
+      <button class="btn" id="restart" type="button" aria-label="처음부터"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5V2L7 6l5 4V7a5 5 0 1 1-5 5H5a7 7 0 1 0 7-7z" fill="currentColor"/></svg><span class="lbl">처음부터</span></button>
+      <input id="scrub" type="range" min="0" max="60" step="0.01" value="0" aria-label="재생 위치">
+      <span class="time" id="time">00:00 / 01:00</span>
+      <button class="btn" id="sound" type="button" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/><path id="soundWave" d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" opacity=".35"/></svg><span class="lbl" id="soundLbl">소리 켜기</span></button>
+    </figcaption>
+  </figure>
+
+  <ul class="chapters" id="chapters" aria-label="장면 목록"></ul>
+  <p class="note"><span><span class="sw" style="background:var(--up)"></span>빨강 = 상승</span><span><span class="sw" style="background:var(--down)"></span>파랑 = 하락 (국내 증권앱 기준)</span><span>스페이스바로 재생/정지</span></p>
+</main>
+
+<script>
+(() => {
+const NS = 'http://www.w3.org/2000/svg';
+const $ = s => document.querySelector(s);
+const el = (tag, attrs, parent) => { const e = document.createElementNS(NS, tag); if (attrs) for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; };
+const clamp = (v, a = 0, b = 1) => v < a ? a : v > b ? b : v;
+const lerp = (a, b, p) => a + (b - a) * p;
+const seg = (t, a, b) => clamp((t - a) / (b - a));
+const eIO = p => p < .5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2;
+const eOut = p => 1 - Math.pow(1 - p, 3);
+const eBack = p => { const c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math.pow(p - 1, 3) + c1 * Math.pow(p - 1, 2); };
+const eBounce = p => { const n = 7.5625, d = 2.75; if (p < 1 / d) return n * p * p; if (p < 2 / d) return n * (p -= 1.5 / d) * p + .75; if (p < 2.5 / d) return n * (p -= 2.25 / d) * p + .9375; return n * (p -= 2.625 / d) * p + .984375; };
+const win = (t, a, b, f = .35) => Math.min(seg(t, a, a + f), 1 - seg(t, b - f, b));
+const rng = seed => () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let x = Math.imul(seed ^ seed >>> 15, 1 | seed); x = x + Math.imul(x ^ x >>> 7, 61 | x) ^ x; return ((x ^ x >>> 14) >>> 0) / 4294967296; };
+const show = (e, v) => e.setAttribute('display', v ? 'inline' : 'none');
+const f1 = n => n.toFixed(1);
+
+const DUR = 60;
+const HEAD = '#5b3a2c', DARK = '#1d120d', SHIRT = '#efe9de';
+const DOWN = '#4f86ff', UP = '#ff5a4f';
+
+/* ---------------- CITY ---------------- */
+const r = rng(11);
+const starEls = [];
+for (let i = 0; i < 70; i++) starEls.push({ e: el('circle', { cx: f1(r() * 1280), cy: f1(r() * 300), r: (r() * 1.4 + .4).toFixed(2), fill: '#f3ecdf' }, $('#stars')), ph: r() * 6.28, sp: 1 + r() * 2 });
+for (let x = -20; x < 1300;) { const w = 60 + r() * 90, h = 150 + r() * 220; el('rect', { x: f1(x), y: f1(640 - h), width: f1(w), height: f1(h), fill: '#161a30' }, $('#cityBack')); x += w + 2; }
+function windows(parent, x0, y0, w, h, lit, store) {
+  for (let y = y0 + 18; y < y0 + h - 28; y += 34) for (let x = x0 + 12; x < x0 + w - 20; x += 26) {
+    const on = r() < lit;
+    const e = el('rect', { x, y, width: 14, height: 20, fill: on ? '#ffcf7a' : '#2a2f4a', opacity: on ? (.75 + r() * .25).toFixed(2) : 1 }, parent);
+    if (on && store) store.push({ e, off: .8 + r() * 5.6, lit: true });
+  }
+}
+[[-10, 120, 300], [100, 150, 230], [240, 190, 360], [850, 80, 260]].forEach(([x, w, h]) => { el('rect', { x, y: 640 - h, width: w, height: h, fill: '#1f2440' }, $('#cityFront')); windows($('#cityFront'), x, 640 - h, w, h, .3); });
+const towerLit = []; windows($('#towerWindows'), 430, 330, 420, 310, .6, towerLit);
+windows($('#pubWindows'), 930, 368, 320, 150, .4);
+
+const ticker = $('#ticker');
+[['NASDAQ ', '#c9c3d6'], ['▼2.81%', DOWN], ['     S&P 500 ', '#c9c3d6'], ['▼1.94%', DOWN], ['     반도체지수 ', '#c9c3d6'], ['▼4.12%', DOWN], ['     원/달러 ', '#c9c3d6'], ['▲1,412.5', UP], ['     내 계좌 ', '#c9c3d6'], ['▼38.2%', DOWN]]
+  .forEach(([s, c]) => { const ts = el('tspan', { fill: c }, ticker); ts.textContent = s; ts.setAttribute('xml:space', 'preserve'); });
+ticker.setAttribute('style', 'white-space:pre');
+let tickW = 1400;
+
+function walkerMarkup(id, jacket, tie) {
+  return `<g id="${id}">
+    <line id="${id}-l1" x1="-6" y1="-44" x2="-6" y2="0" stroke="#3a2820" stroke-width="8" stroke-linecap="round"/>
+    <line id="${id}-l2" x1="6" y1="-44" x2="6" y2="0" stroke="#3a2820" stroke-width="8" stroke-linecap="round"/>
+    <ellipse cx="-28" cy="-62" rx="20" ry="14" fill="#4a2f24"/>
+    <rect x="-18" y="-102" width="36" height="60" rx="14" fill="${jacket}"/>
+    <path d="M-3,-100 L3,-100 L5,-70 L0,-64 L-5,-70Z" fill="${tie}"/>
+    <rect x="14" y="-58" width="26" height="20" rx="3" fill="#24150e"/>
+    <line x1="10" y1="-88" x2="24" y2="-60" stroke="${jacket}" stroke-width="8" stroke-linecap="round"/>
+    <g id="${id}-head">
+      <path d="M-6,-136 Q-12,-152 -22,-162 M8,-136 Q14,-152 20,-162" stroke="#3a2820" stroke-width="4" fill="none"/>
+      <circle cx="-22" cy="-162" r="5" fill="#3a2820"/><circle cx="20" cy="-162" r="5" fill="#3a2820"/>
+      <circle cx="0" cy="-118" r="23" fill="${HEAD}"/>
+      <ellipse cx="10" cy="-121" rx="6" ry="7" fill="#fffaf0"/><circle cx="12" cy="-118" r="3" fill="${DARK}"/>
+      <rect x="2" y="-130" width="16" height="6" fill="${HEAD}"/>
+    </g>
+  </g>`;
+}
+$('#walkers').innerHTML = walkerMarkup('wa', '#2f3a56', DOWN) + walkerMarkup('wb', '#556b5a', UP);
+const walkers = ['wa', 'wb'].map(id => ({ g: $('#' + id), l1: $('#' + id + '-l1'), l2: $('#' + id + '-l2'), head: $('#' + id + '-head') }));
+
+/* ---------------- PUB ---------------- */
+for (let x = 40; x < 1280; x += 64) el('line', { x1: x, y1: 434, x2: x, y2: 720, stroke: '#1c100b', 'stroke-width': 3 }, $('#planks'));
+for (let i = 0; i < 12; i++) { const a = i * 30 * Math.PI / 180; el('line', { x1: f1(770 + Math.sin(a) * 34), y1: f1(100 - Math.cos(a) * 34), x2: f1(770 + Math.sin(a) * 39), y2: f1(100 - Math.cos(a) * 39), stroke: '#2a1a12', 'stroke-width': i % 3 ? 2 : 4 }, $('#clockTicks')); }
+const r3 = rng(3);
+const bokehCols = ['#ffcf7a', '#ff7a4a', '#7fa2ff', '#ffe9be', '#ff5a4f'];
+for (let i = 0; i < 14; i++) el('circle', { cx: f1(46 + r3() * 180), cy: f1(256 + r3() * 170), r: f1(5 + r3() * 11), fill: bokehCols[i % 5], opacity: (.35 + r3() * .35).toFixed(2) }, $('#bokeh'));
+const rain = [];
+for (let i = 0; i < 18; i++) rain.push({ e: el('line', { x1: 0, y1: 0, x2: -4, y2: 18, stroke: '#a9bbff', 'stroke-width': 1.5, opacity: .35 }, $('#rain')), x: 46 + r3() * 186, o: r3() * 200, sp: 220 + r3() * 120 });
+
+function antMarkup(p, o) {
+  const eyes = [[6, -262], [48, -258]];
+  const eyeSvg = eyes.map(([x, y], i) => `
+    <clipPath id="${p}-ec${i}"><ellipse cx="${x}" cy="${y}" rx="15" ry="19"/></clipPath>
+    <ellipse cx="${x}" cy="${y}" rx="15" ry="19" fill="#fffaf0"/>
+    <g clip-path="url(#${p}-ec${i})">
+      <circle id="${p}-pup${i}" cx="${x + 4}" cy="${y}" r="8" fill="${DARK}"/>
+      <circle cx="${x + 7}" cy="${y - 5}" r="2.6" fill="#fff"/>
+      <rect id="${p}-lid${i}" x="${x - 20}" y="${y - 21}" width="40" height="0" fill="${HEAD}"/>
+    </g>`).join('');
+  return `
+  <ellipse cx="-92" cy="-80" rx="60" ry="45" fill="#47291e"/>
+  <ellipse cx="-108" cy="-96" rx="24" ry="11" fill="#6b4434" opacity=".55"/>
+  <rect x="-58" y="-194" width="136" height="196" rx="48" fill="${o.jacket}"/>
+  <path d="M-4,-192 L40,-192 L18,-126 Z" fill="${SHIRT}"/>
+  <g transform="rotate(${o.tieRot} 18 -184)"><path d="M12,-186 L24,-186 L22,-176 L28,-104 L18,-92 L8,-104 L14,-176 Z" fill="${o.tie}"/></g>
+  <path d="M-4,-192 L18,-126 L4,-96 M40,-192 L18,-126 L32,-96" stroke="rgba(0,0,0,.28)" stroke-width="4" fill="none" stroke-linejoin="round"/>
+  <path d="M38,-190 Q58,-162 57,-134" stroke="#d8d0c0" stroke-width="2.5" fill="none"/>
+  <rect x="44" y="-134" width="26" height="34" rx="4" fill="#f3ecdf"/>
+  <rect x="44" y="-134" width="26" height="9" rx="3" fill="${o.badge}"/>
+  <rect x="49" y="-120" width="16" height="3" fill="#9a94a6"/><rect x="49" y="-113" width="11" height="3" fill="#9a94a6"/>
+  <g id="${p}-head">
+    <rect x="6" y="-208" width="28" height="24" fill="${HEAD}"/>
+    <g id="${p}-an0"><path d="M-2,-302 Q-12,-346 -34,-372" stroke="${HEAD}" stroke-width="7" fill="none" stroke-linecap="round"/><circle cx="-34" cy="-372" r="10" fill="${HEAD}"/></g>
+    <g id="${p}-an1"><path d="M40,-304 Q54,-346 72,-370" stroke="${HEAD}" stroke-width="7" fill="none" stroke-linecap="round"/><circle cx="72" cy="-370" r="10" fill="${HEAD}"/></g>
+    <circle cx="20" cy="-250" r="64" fill="${HEAD}"/>
+    <ellipse cx="-6" cy="-286" rx="22" ry="11" fill="#7a5040" opacity=".55" transform="rotate(-28 -6 -286)"/>
+    <circle id="${p}-glow" cx="20" cy="-250" r="64" fill="${DOWN}" opacity="0"/>
+    <ellipse id="${p}-blush0" cx="74" cy="-226" rx="11" ry="7" fill="#ff7b7b" opacity="0"/>
+    <ellipse id="${p}-blush1" cx="-10" cy="-228" rx="12" ry="7" fill="#ff7b7b" opacity="0"/>
+    <g id="${p}-eyes">${eyeSvg}</g>
+    <path id="${p}-happy" d="M-8,-258 Q6,-276 20,-258 M34,-254 Q48,-272 62,-254" stroke="${DARK}" stroke-width="6" stroke-linecap="round" fill="none" opacity="0"/>
+    <line id="${p}-brow0" x1="-8" y1="-293" x2="20" y2="-293" stroke="${DARK}" stroke-width="6" stroke-linecap="round"/>
+    <line id="${p}-brow1" x1="34" y1="-289" x2="62" y2="-289" stroke="${DARK}" stroke-width="6" stroke-linecap="round"/>
+    <path id="${p}-mouth" d="" stroke="${DARK}" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+    ${o.glasses ? `<g stroke="#e9dccb" stroke-width="4" fill="none"><circle cx="6" cy="-262" r="21"/><circle cx="48" cy="-258" r="21"/><path d="M26,-264 Q27,-268 28,-262"/><path d="M-15,-266 L-40,-274"/></g>` : ''}
+  </g>
+  <path id="${p}-arm" d="" stroke="${o.jacket}" stroke-width="24" stroke-linecap="round" fill="none"/>
+  <circle id="${p}-hand" r="13" fill="${HEAD}"/>`;
+}
+$('#antA').innerHTML = antMarkup('a', { jacket: '#2f3a56', tie: DOWN, badge: DOWN, glasses: true, tieRot: 0 });
+$('#antB').innerHTML = antMarkup('b', { jacket: '#556b5a', tie: UP, badge: UP, glasses: false, tieRot: 9 });
+const ANT = {};
+['a', 'b'].forEach(p => {
+  const g = id => $('#' + p + '-' + id);
+  ANT[p] = { head: g('head'), an0: g('an0'), an1: g('an1'), glow: g('glow'), blush: [g('blush0'), g('blush1')], eyes: g('eyes'), happy: g('happy'),
+    pup: [g('pup0'), g('pup1')], lid: [g('lid0'), g('lid1')], brow: [g('brow0'), g('brow1')], mouth: g('mouth'), arm: g('arm'), hand: g('hand'),
+    ox: p === 'a' ? 380 : 900, sx: p === 'a' ? 1 : -1, ph: p === 'a' ? 0 : 1.7, droop: 0, tilt: 0, glowV: 0 };
+});
+const EYES = [[6, -262], [48, -258]];
+
+function mugMarkup(p, s) {
+  let bub = '';
+  for (let i = 0; i < 7; i++) bub += `<circle cx="${-24 + i * 8}" cy="-10" r="${(1.6 + (i % 3) * .7).toFixed(1)}" fill="#fff4d0" opacity=".75"/>`;
+  return `
+  <clipPath id="${p}-bc"><rect id="${p}-lv" x="-33" y="-96" width="66" height="92"/></clipPath>
+  <path d="M${s * 36},-94 C${s * 70},-94 ${s * 70},-24 ${s * 36},-24" stroke="#ffffff" stroke-opacity=".6" stroke-width="11" fill="none"/>
+  <rect x="-33" y="-108" width="66" height="104" fill="url(#beerGrad)" clip-path="url(#${p}-bc)"/>
+  <g clip-path="url(#${p}-bc)" id="${p}-bubs">${bub}</g>
+  <g id="${p}-foam"><rect x="-33" y="-4" width="66" height="13" fill="#fff3d6"/><circle cx="-24" cy="-4" r="10" fill="#fff3d6"/><circle cx="-6" cy="-8" r="12" fill="#fff3d6"/><circle cx="14" cy="-6" r="11" fill="#fff3d6"/><circle cx="28" cy="-3" r="8" fill="#fff3d6"/></g>
+  <rect x="-37" y="-112" width="74" height="112" rx="9" fill="#ffffff" fill-opacity=".08" stroke="#ffffff" stroke-opacity=".6" stroke-width="3"/>
+  <rect x="-35" y="-12" width="70" height="11" rx="4" fill="#ffffff" fill-opacity=".22"/>
+  <rect x="-25" y="-100" width="7" height="80" rx="3.5" fill="#ffffff" opacity=".28"/>`;
+}
+$('#mugA').innerHTML = mugMarkup('a', -1);
+$('#mugB').innerHTML = mugMarkup('b', 1);
+const MUG = {
+  a: { g: $('#mugA'), lv: $('#a-lv'), foam: $('#a-foam'), bubs: [...$('#a-bubs').children], s: -1, drop: 21.8, rest: [545, 528, 0], clink: [578, 420, 14], sip: [522, 416, -55] },
+  b: { g: $('#mugB'), lv: $('#b-lv'), foam: $('#b-foam'), bubs: [...$('#b-bubs').children], s: 1, drop: 22.05, rest: [735, 528, 0], clink: [702, 420, -14], sip: [758, 416, 55] }
+};
+
+/* phone card charts */
+(() => {
+  const r2 = rng(5), pts = [];
+  for (let i = 0; i <= 24; i++) { const x = 524 + i * (232 / 24); let y = 300 + i * 4.4 + (r2() - .5) * 18 + (i > 16 ? (i - 16) * 1.2 : 0); if (i === 0) y = 300; pts.push([x, Math.min(y, 412)]); }
+  const d = 'M' + pts.map(p => f1(p[0]) + ',' + f1(p[1])).join(' L');
+  $('#c1line').setAttribute('d', d);
+  $('#c1area').setAttribute('d', d + ' L756,420 L524,420 Z');
+  const C = [[312, 332], [326, 350], [342, 360], [356, 382], [374, 394], [388, 414], [404, 432], [424, 452]];
+  C.forEach(([o, c], i) => {
+    const x = 532 + i * 24;
+    el('line', { x1: x + 7, y1: o - 8, x2: x + 7, y2: c + 8, stroke: DOWN, 'stroke-width': 2 }, $('#candles'));
+    el('rect', { x, y: o, width: 14, height: c - o, fill: DOWN, rx: 2 }, $('#candles'));
+  });
+  el('line', { id: 'redWick', x1: 735, y1: 452, x2: 735, y2: 452, stroke: UP, 'stroke-width': 2 }, $('#candles'));
+  el('rect', { id: 'redBody', x: 728, y: 452, width: 14, height: 0, fill: UP, rx: 2 }, $('#candles'));
+})();
+const c1len = $('#c1line').getTotalLength();
+$('#c1line').setAttribute('stroke-dasharray', c1len);
+
+/* burst */
+const drops = [], lines = [];
+(() => {
+  const r4 = rng(9);
+  for (let i = 0; i < 26; i++) { const a = (-165 + r4() * 150) * Math.PI / 180, sp = 220 + r4() * 260; drops.push({ e: el('circle', { r: f1(4 + r4() * 6), fill: i % 3 ? '#fff3d6' : '#f2a93b' }, $('#drops')), vx: Math.cos(a) * sp, vy: Math.sin(a) * sp }); }
+  for (let i = 0; i < 10; i++) { const a = (i / 10) * Math.PI * 2 + .2; lines.push({ e: el('line', {}, $('#speedLines')), a }); }
+})();
+
+/* endcard mugs */
+function miniMug(s) { return `<path d="M${s * 22},-48 C${s * 44},-48 ${s * 44},-16 ${s * 22},-16" stroke="#f3ecdf" stroke-width="7" fill="none"/><rect x="-22" y="-60" width="44" height="60" rx="6" fill="#f2a93b"/><rect x="-24" y="-68" width="48" height="14" rx="7" fill="#fff3d6"/><circle cx="-12" cy="-70" r="7" fill="#fff3d6"/><circle cx="6" cy="-72" r="8" fill="#fff3d6"/>`; }
+$('#em1').innerHTML = miniMug(-1); $('#em2').innerHTML = miniMug(1);
+
+/* floating texts */
+const FLOATS = [
+  { a: 13.6, b: 15.6, x: 980, y: 250, text: 'ㅠㅠ', size: 34, fill: '#8fb4ff' },
+  { a: 41.2, b: 42.8, x: 300, y: 200, text: 'ㅋㅋㅋ', size: 36, fill: '#ffd36b' },
+  { a: 41.4, b: 43.0, x: 980, y: 200, text: 'ㅋㅋㅋㅋ', size: 36, fill: '#ffd36b' },
+  { a: 50.6, b: 52.8, x: 330, y: 210, text: '오오!', size: 34, fill: '#ff8a7a' },
+];
+FLOATS.forEach(f => { f.e = el('text', { class: 'f-hand', 'font-size': f.size, fill: f.fill, 'text-anchor': 'middle', opacity: 0 }, $('#pubFloat')); f.e.textContent = f.text; });
+const sigh = el('text', { class: 'f-hand', 'font-size': 30, fill: '#c9c3d6', 'text-anchor': 'middle', opacity: 0 }, $('#cityFloat')); sigh.textContent = '하아…';
+
+/* dialogue */
+const LINES = [
+  { a: 9.6, b: 12.4, who: 'a', text: '형… 오늘 계좌 봤어?' },
+  { a: 12.6, b: 15.4, who: 'b', text: '안 봤어.\n아니, 못 봤어.' },
+  { a: 20.6, b: 22.9, who: 'b', text: '…파랗다.\n바다처럼.' },
+  { a: 23.0, b: 25.2, who: 'a', text: '일단 마시자.' },
+  { a: 29.6, b: 32.5, who: 'a', text: '손절 안 했으니까\n아직 잃은 거 아니야.' },
+  { a: 32.6, b: 35.5, who: 'b', text: '그렇지.\n이건 평가손실일 뿐이야.' },
+  { a: 35.6, b: 38.5, who: 'a', text: '10년 뒤엔 오늘이\n저점이었을 거야.' },
+  { a: 38.6, b: 41.2, who: 'b', text: '그 말,\n작년 이맘때도 했어.' },
+  { a: 46.0, b: 48.4, who: 'a', text: '…딱 한 번만 볼까?' },
+  { a: 50.4, b: 53.0, who: 'b', text: '빨간불이다!!' },
+];
+const CAPS = [
+  { a: .4, b: 6.8, text: 'PM 7:40 · 을지로 노가리 골목' },
+  { a: 15.8, b: 20.4, text: '※ 국내 증권앱에선 파란색이 하락, 빨간색이 상승' },
+  { a: 42.6, b: 44.5, text: '그렇게 몇 잔이 더 지나고…' },
+  { a: 44.7, b: 48.2, text: 'PM 11:30 · 미국 정규장 개장 (서머타임 해제)' },
+];
+
+function makeBubble(id, who) {
+  const g = $('#' + id);
+  const shadow = el('rect', { rx: 22, fill: '#000', opacity: .3 }, g);
+  const tail = el('path', { fill: '#fffaf0' }, g);
+  const box = el('rect', { rx: 22, fill: '#fffaf0' }, g);
+  const txt = el('text', { class: 'f-hand', 'font-size': 31, fill: '#1d1622', 'text-anchor': 'middle' }, g);
+  return { g, shadow, tail, box, txt, cur: null, who, tip: who === 'a' ? [366, 236] : [914, 236] };
+}
+const BUB = { a: makeBubble('bubbleA', 'a'), b: makeBubble('bubbleB', 'b') };
+function setBubble(b, text) {
+  b.cur = text;
+  while (b.txt.firstChild) b.txt.firstChild.remove();
+  const ls = text.split('\n'), spans = ls.map(l => { const s = el('tspan', {}, b.txt); s.textContent = l; return s; });
+  let mw = 0; spans.forEach(s => { mw = Math.max(mw, s.getComputedTextLength()); });
+  const w = mw + 52, h = ls.length * 38 + 30;
+  const cx = b.who === 'a' ? 230 : 1050;
+  const x = clamp(cx - w / 2, 24, 1256 - w), y = 198 - h;
+  [b.box, b.shadow].forEach((e, i) => { e.setAttribute('x', f1(x)); e.setAttribute('y', f1(y + i * 0)); e.setAttribute('width', f1(w)); e.setAttribute('height', f1(h)); });
+  b.shadow.setAttribute('y', f1(y + 6));
+  spans.forEach((s, i) => { s.setAttribute('x', f1(x + w / 2)); s.setAttribute('y', f1(y + 44 + i * 38)); });
+  const bx = b.who === 'a' ? x + w * .62 : x + w * .38 - 34;
+  b.tail.setAttribute('d', `M${f1(bx)},${f1(y + h - 4)} L${b.tip[0]},${b.tip[1]} L${f1(bx + 34)},${f1(y + h - 4)} Z`);
+}
+const cap = { g: $('#caption'), bg: $('#capBg'), txt: $('#capText'), cur: null };
+function setCaption(text) {
+  cap.cur = text; cap.txt.textContent = text;
+  cap.bg.setAttribute('width', f1(cap.txt.getComputedTextLength() + 36));
+}
+
+/* character direction */
+const MOUTH = {
+  neutral: ['M22,-214 Q34,-208 46,-214', 'none'],
+  sad: ['M22,-206 Q34,-218 46,-206', 'none'],
+  deadpan: ['M22,-211 L46,-211', 'none'],
+  sheepish: ['M22,-210 Q36,-206 48,-217', 'none'],
+  shock: ['M27,-212 a7,9 0 1,0 14,0 a7,9 0 1,0 -14,0', DARK],
+  happy: ['M16,-218 Q34,-190 52,-218 Z', DARK],
+  laugh: ['M12,-220 Q34,-176 58,-220 Z', DARK],
+  drink: ['M26,-212 L42,-212', 'none'],
+  talk: ['M22,-216 Q34,-196 46,-216 Q34,-220 22,-216 Z', DARK],
+};
+const MOODS = {
+  neutral: { lid: .12, b: [0, 0, 0], happy: 0, droop: 0 },
+  sad: { lid: .45, b: [-16, 16, 3], happy: 0, droop: 1 },
+  deadpan: { lid: .55, b: [0, 0, 6], happy: 0, droop: .5 },
+  sheepish: { lid: .25, b: [-10, 10, 0], happy: 0, droop: .2 },
+  shock: { lid: 0, b: [0, 0, -9], happy: 0, droop: -.5 },
+  happy: { lid: 0, b: [0, 0, -6], happy: 1, droop: -.4 },
+  laugh: { lid: 0, b: [4, -4, -8], happy: 1, droop: -.5 },
+  drink: { lid: 0, b: [0, 0, -4], happy: 1, droop: -.2 },
+};
+const SCRIPT = {
+  a: [[8, 'sad', 'phone'], [9.5, 'sad', 'friend'], [15.5, 'shock', 'phone'], [20.5, 'sad', 'friend'], [23, 'neutral', 'friend'], [25.3, 'happy', 'friend'], [27, 'drink', 'friend'],
+      [29.2, 'neutral', 'friend'], [38.6, 'sheepish', 'friend'], [41.2, 'laugh', 'friend'], [42.6, 'neutral', 'friend'], [44.6, 'shock', 'phone'], [46, 'sheepish', 'friend'], [48.5, 'shock', 'phone'], [50.3, 'happy', 'friend']],
+  b: [[8, 'sad', 'phone'], [12.5, 'sad', 'friend'], [15.5, 'sad', 'phone'], [20.5, 'deadpan', 'friend'], [23, 'neutral', 'friend'], [25.3, 'happy', 'friend'], [27, 'drink', 'friend'],
+      [29.2, 'neutral', 'friend'], [35.6, 'deadpan', 'friend'], [41.2, 'laugh', 'friend'], [42.6, 'neutral', 'friend'], [44.6, 'shock', 'phone'], [46, 'neutral', 'friend'], [48.5, 'shock', 'phone'], [50.3, 'laugh', 'friend']]
+};
+function stateFor(p, t) { let s = SCRIPT[p][0]; for (const row of SCRIPT[p]) if (t >= row[0]) s = row; return { mood: s[1], look: s[2] }; }
+const activeLine = t => LINES.find(l => t >= l.a && t < l.b);
+
+function mugPose(p, t) {
+  const m = MUG[p];
+  if (t < m.drop) return [m.rest[0], -220, 0];
+  if (t < m.drop + .8) return [m.rest[0], lerp(-160, m.rest[1], eBounce(seg(t, m.drop, m.drop + .8))), 0];
+  const B = (P, Q, k) => [lerp(P[0], Q[0], k), lerp(P[1], Q[1], k), lerp(P[2], Q[2], k)];
+  let q = m.rest;
+  if (t >= 25.3 && t < 26.3) q = B(m.rest, m.clink, eIO(seg(t, 25.3, 26.3)));
+  else if (t >= 26.3 && t < 27) q = m.clink;
+  else if (t >= 27 && t < 27.8) q = B(m.clink, m.sip, eIO(seg(t, 27, 27.8)));
+  else if (t >= 27.8 && t < 28.8) q = m.sip;
+  else if (t >= 28.8 && t < 29.6) q = B(m.sip, m.rest, eIO(seg(t, 28.8, 29.6)));
+  q = q.slice();
+  if (t >= 26.3 && t < 26.8) q[0] += Math.sin(t * 110) * 5 * (1 - seg(t, 26.3, 26.8)) * (p === 'a' ? -1 : 1);
+  return q;
+}
+function beerLevel(t) {
+  if (t < 27.8) return .92;
+  if (t < 28.8) return lerp(.92, .62, seg(t, 27.8, 28.8));
+  if (t < 43.3) return lerp(.62, .36, seg(t, 29.6, 42.4));
+  return .9;
+}
+function gripWorld(p, t) {
+  const m = MUG[p], [x, y, a] = mugPose(p, t), rad = a * Math.PI / 180, gx = m.s * 61.5, gy = -59;
+  return [x + gx * Math.cos(rad) - gy * Math.sin(rad), y + gx * Math.sin(rad) + gy * Math.cos(rad)];
+}
+function clockMin(t) {
+  const s = 19 * 60 + 40;
+  if (t < 42.6) return lerp(s, 21 * 60 + 20, seg(t, 7, 42.6));
+  if (t < 44.4) return lerp(21 * 60 + 20, 23 * 60 + 29, eIO(seg(t, 42.6, 44.4)));
+  return lerp(23 * 60 + 29, 23 * 60 + 37, seg(t, 44.4, 60));
+}
+
+function renderAnt(p, t, k) {
+  const A = ANT[p], st = stateFor(p, t), m = MOODS[st.mood];
+  const line = activeLine(t), speaking = line && line.who === p;
+  const blink = !m.happy && ((t + A.ph) % 3.9) < .13;
+  const lid = blink ? 1 : m.lid;
+  A.eyes.setAttribute('opacity', m.happy ? 0 : 1);
+  A.happy.setAttribute('opacity', m.happy ? 1 : 0);
+  const phone = st.look === 'phone';
+  EYES.forEach(([ex, ey], i) => {
+    A.lid[i].setAttribute('height', f1(lid * 42));
+    A.pup[i].setAttribute('cx', f1(ex + (phone ? 3 : 5)));
+    A.pup[i].setAttribute('cy', f1(ey + (phone ? 8 : 0)));
+    A.pup[i].setAttribute('r', st.mood === 'shock' ? 5.5 : 8);
+    const bx = ex, by = ey - 31;
+    A.brow[i].setAttribute('transform', `translate(0,${m.b[2]}) rotate(${m.b[i]} ${bx} ${by})`);
+  });
+  let key = st.mood;
+  if (speaking) { const open = Math.sin(t * 21 + A.ph) > 0; key = open ? (m.happy ? 'laugh' : 'talk') : (m.happy ? 'happy' : (key === 'sad' ? 'sad' : 'neutral')); }
+  A.mouth.setAttribute('d', MOUTH[key][0]); A.mouth.setAttribute('fill', MOUTH[key][1]);
+
+  A.droop += (m.droop - A.droop) * k;
+  const springy = st.mood === 'happy' || st.mood === 'laugh';
+  const amp = springy ? 9 : 2.5, fr = springy ? 10 : 2;
+  A.an0.setAttribute('transform', `rotate(${f1(-A.droop * 32 + Math.sin(t * fr + A.ph) * amp)} -2 -302)`);
+  A.an1.setAttribute('transform', `rotate(${f1(A.droop * 32 + Math.sin(t * fr + A.ph + 1.3) * amp)} 40 -304)`);
+
+  const tiltT = phone ? 9 : st.mood === 'laugh' ? -8 : st.mood === 'sad' ? 4 : 0;
+  A.tilt += (tiltT - A.tilt) * k;
+  let bob = Math.sin(t * 1.7 + A.ph) * 1.4;
+  if (speaking) bob += Math.sin(t * 11) * 2.2;
+  if (st.mood === 'laugh') bob -= Math.abs(Math.sin(t * 13)) * 5;
+  const lean = 10 * eIO(seg(t, 25.3, 26.3)) * (1 - eIO(seg(t, 26.8, 27.6)));
+  A.head.setAttribute('transform', `translate(${f1(lean)},${f1(bob)}) rotate(${f1(A.tilt)} 20 -196)`);
+
+  const red = t >= 49.6 && t < 53.2, lit = (t >= 8 && t < 20.5) || (t >= 44.6 && t < 53.2);
+  const gT = lit ? (phone ? .32 : .12) : 0;
+  A.glowV += (gT - A.glowV) * k;
+  A.glow.setAttribute('opacity', A.glowV.toFixed(3));
+  A.glow.setAttribute('fill', red ? UP : DOWN);
+  const blush = (seg(t, 27.5, 44) * .75).toFixed(2);
+  A.blush.forEach(b => b.setAttribute('opacity', blush));
+
+  const rest = [p === 'a' ? 465 : 815, 520];
+  const grip = gripWorld(p, t);
+  const kk = eIO(seg(t, 22.9, 23.5)) * (1 - eIO(seg(t, 44.8, 45.4)));
+  const hw = [lerp(rest[0], grip[0], kk), lerp(rest[1], grip[1], kk)];
+  const hx = (hw[0] - A.ox) * A.sx, hy = hw[1] - 560;
+  const sx = 62, sy = -160, mx = (sx + hx) / 2, my = (sy + hy) / 2;
+  A.arm.setAttribute('d', `M${sx},${sy} Q${f1(mx - 14)},${f1(my + 26)} ${f1(hx)},${f1(hy)}`);
+  A.hand.setAttribute('cx', f1(hx)); A.hand.setAttribute('cy', f1(hy));
+}
+
+function renderMug(p, t) {
+  const m = MUG[p], [x, y, a] = mugPose(p, t), l = beerLevel(t);
+  m.g.setAttribute('transform', `translate(${f1(x)},${f1(y)}) rotate(${f1(a)})`);
+  const top = -4 - l * 92;
+  m.lv.setAttribute('y', f1(top)); m.lv.setAttribute('height', f1(-4 - top));
+  const settle = t >= m.drop + .4 && t < m.drop + 1.6 ? Math.sin((t - m.drop) * 18) * 3 * (1 - seg(t, m.drop + .4, m.drop + 1.6)) : 0;
+  m.foam.setAttribute('transform', `translate(0,${f1(top + 4 + settle)})`);
+  const span = Math.max(6, l * 92 - 8);
+  m.bubs.forEach((b, i) => b.setAttribute('cy', f1(-6 - ((t * 34 * (1 + i * .13) + i * 13) % span))));
+}
+
+/* ---------------- RENDER ---------------- */
+const city = $('#city'), pub = $('#pub'), pubInner = $('#pubInner');
+function render(t, dt) {
+  const k = dt >= .25 ? 1 : 1 - Math.exp(-dt * 8);
+  const inCity = t < 8.2;
+  show(city, inCity); show(pub, !inCity);
+
+  if (inCity) {
+    starEls.forEach(s => s.e.setAttribute('opacity', (.35 + .65 * (.5 + .5 * Math.sin(t * s.sp + s.ph))).toFixed(2)));
+    towerLit.forEach(w => { const on = t < w.off; if (on !== w.lit) { w.lit = on; w.e.setAttribute('fill', on ? '#ffcf7a' : '#2a2f4a'); } });
+    ticker.setAttribute('x', f1(850 - ((t * 120) % (tickW + 420))));
+    const pr = seg(t, .2, 6.4), xA = lerp(110, 1085, pr), fadeIn = 1 - seg(t, 5.9, 6.5);
+    walkers.forEach((w, i) => {
+      const x = xA - i * 66, ph = t * 9 + i * 1.4, sw = Math.sin(ph) * 10, bob = -Math.abs(Math.sin(ph)) * 4;
+      w.g.setAttribute('transform', `translate(${f1(x)},${f1(640 + bob * .5)}) scale(.5)`);
+      w.g.setAttribute('opacity', fadeIn.toFixed(2));
+      w.l1.setAttribute('x2', f1(-6 + sw)); w.l2.setAttribute('x2', f1(6 - sw));
+      w.head.setAttribute('transform', `rotate(${f1(10 + Math.sin(t * 2 + i) * 2)} 0 -100)`);
+    });
+    const sp = seg(t, 2.4, 4.4);
+    sigh.setAttribute('x', f1(xA - 33)); sigh.setAttribute('y', f1(560 - sp * 30));
+    sigh.setAttribute('opacity', win(t, 2.4, 4.4, .4).toFixed(2));
+    $('#titleCard').setAttribute('opacity', (1 - seg(t, 5.6, 6.6)).toFixed(2));
+    const z = 1 + eIO(seg(t, 6.6, 8.2)) * 1.6;
+    city.setAttribute('transform', `translate(1090,594) scale(${z.toFixed(3)}) translate(-1090,-594)`);
+    $('#pubSign').setAttribute('opacity', ((t % 5.3) < .1 || ((t % 5.3) > .2 && (t % 5.3) < .26)) ? .4 : 1);
+  } else {
+    $('#lamp').setAttribute('transform', `rotate(${f1(Math.sin(t * .8) * 1.6)} 640 0)`);
+    const ft = t % 7.3; $('#neonHof').setAttribute('opacity', (ft < .1 || (ft > .22 && ft < .3)) ? .35 : 1);
+    const M = clockMin(t);
+    $('#hourHand').setAttribute('transform', `rotate(${f1(((M / 60) % 12) * 30)} 770 100)`);
+    $('#minHand').setAttribute('transform', `rotate(${f1((M % 60) * 6)} 770 100)`);
+    rain.forEach(d => { const y = 240 + ((d.o + t * d.sp) % 210); d.e.setAttribute('transform', `translate(${f1(d.x)},${f1(y)})`); });
+
+    const live = t >= 44.6;
+    $('#tvDown').setAttribute('opacity', live ? 0 : 1); $('#tvLive').setAttribute('opacity', live ? 1 : 0);
+    $('#liveDot').setAttribute('opacity', (Math.sin(t * 6) > 0) ? 1 : .3);
+    const up = t >= 49.6;
+    const tvVal = $('#tvVal');
+    if (up) { tvVal.textContent = '▲0.42%'; tvVal.setAttribute('fill', UP); } else { tvVal.textContent = '개장 직후'; tvVal.setAttribute('fill', '#a7a2b6'); }
+    let d = '';
+    for (let i = 0; i <= 30; i++) {
+      const x = 972 + i * 8;
+      const trend = !live ? i * 1.1 : (up ? -i * .9 : 0);
+      const y = 162 + trend + Math.sin(i * .9 + t * 2.2) * 5 + Math.sin(i * 2.3 + t * 1.3) * 3 - (live ? 0 : 14);
+      d += (i ? ' L' : 'M') + x + ',' + f1(y);
+    }
+    $('#tvLine').setAttribute('d', d); $('#tvLine').setAttribute('stroke', up ? UP : DOWN);
+
+    renderAnt('a', t, k); renderAnt('b', t, k);
+    renderMug('a', t); renderMug('b', t);
+
+    const red = t >= 49.6;
+    ['A', 'B'].forEach((P, i) => {
+      const lit = (t >= 8 && t < 20.5) || (t >= 44.6 && t < 53.2);
+      const buzz = t >= 44.6 && t < 45.8 ? Math.sin(t * 95 + i) * 3 : 0;
+      $('#phone' + P).setAttribute('transform', `translate(${f1(buzz)},0)`);
+      $('#glow' + P).setAttribute('opacity', lit ? (.55 + Math.sin(t * 3 + i) * .08).toFixed(2) : 0);
+      $('#glow' + P).setAttribute('fill', red ? UP : DOWN);
+      $('#scr' + P).setAttribute('opacity', lit ? .9 : 0);
+      $('#scr' + P).setAttribute('fill', red ? UP : DOWN);
+    });
+
+    FLOATS.forEach(f => { const p = seg(t, f.a, f.b); f.e.setAttribute('x', f.x); f.e.setAttribute('y', f1(f.y - p * 40)); f.e.setAttribute('opacity', win(t, f.a, f.b, .3).toFixed(2)); });
+
+    ['a', 'b'].forEach(p => {
+      const b = BUB[p], l = LINES.find(L => L.who === p && t >= L.a && t < L.b);
+      if (!l) { b.g.setAttribute('opacity', 0); return; }
+      if (b.cur !== l.text) setBubble(b, l.text);
+      const s = lerp(.2, 1, eBack(seg(t, l.a, l.a + .3))) * (1 - .15 * seg(t, l.b - .2, l.b));
+      const o = 1 - seg(t, l.b - .2, l.b);
+      b.g.setAttribute('opacity', o.toFixed(2));
+      b.g.setAttribute('transform', `translate(${b.tip[0]},${b.tip[1]}) scale(${s.toFixed(3)}) translate(${-b.tip[0]},${-b.tip[1]})`);
+    });
+
+    const dim = Math.max(win(t, 15.5, 20.7, .5) * .62, win(t, 48.5, 53.2, .5) * .62, win(t, 42.6, 44.5, .5) * .35);
+    $('#dim').setAttribute('opacity', dim.toFixed(2));
+    const shake = t >= 26.3 && t < 26.6 ? (1 - seg(t, 26.3, 26.6)) : 0;
+    pubInner.setAttribute('transform', `translate(${f1(Math.sin(t * 140) * 7 * shake)},${f1(Math.cos(t * 120) * 5 * shake)})`);
+  }
+
+  /* phone card */
+  const card2 = t >= 40, ca = card2 ? 48.5 : 15.5, cb = card2 ? 53.1 : 20.7;
+  const cin = eOut(seg(t, ca, ca + .6)), cout = eIO(seg(t, cb - .5, cb));
+  const cy = (1 - cin) * 760 + cout * 760;
+  $('#phoneCard').setAttribute('transform', `translate(0,${f1(cy)})`);
+  show($('#card1'), !card2); show($('#card2'), card2);
+  if (!card2) {
+    const lp = eIO(seg(t, 15.9, 17.4));
+    $('#c1line').setAttribute('stroke-dashoffset', f1(c1len * (1 - lp)));
+    $('#c1area').setAttribute('opacity', seg(t, 16.8, 17.6).toFixed(2));
+    const cp = eOut(seg(t, 15.9, 17.2));
+    $('#c1pct').textContent = (cp === 0 ? '0.0' : '-' + (38.2 * cp).toFixed(1)) + '%';
+    $('#c1krw').textContent = '-₩' + Math.round(12480000 * cp).toLocaleString('ko-KR');
+    [...$('#c1rows').children].forEach((g, i) => g.setAttribute('opacity', seg(t, 17.2 + i * .35, 17.6 + i * .35).toFixed(2)));
+  } else {
+    const gp = eOut(seg(t, 49.3, 50.3));
+    const v = lerp(-.12, .42, gp);
+    $('#c2pct').textContent = (v >= 0 ? '+' : '') + v.toFixed(2) + '%';
+    $('#c2pct').setAttribute('fill', v > 0 ? UP : DOWN);
+    $('#c2sub').setAttribute('opacity', seg(t, 50.2, 50.7).toFixed(2));
+    const h = 34 * gp;
+    $('#redBody').setAttribute('y', f1(452 - h)); $('#redBody').setAttribute('height', f1(h));
+    $('#redWick').setAttribute('y1', f1(452 - h - 8 * gp)); $('#redWick').setAttribute('y2', f1(452 + 6 * gp));
+  }
+
+  /* burst */
+  const bt = t - 26.3;
+  show($('#burst'), bt >= 0 && bt < 1.4);
+  if (bt >= 0 && bt < 1.4) {
+    const zz = $('#zzan'), s = lerp(.3, 1, eBack(seg(bt, 0, .3)));
+    zz.setAttribute('transform', `translate(640,200) scale(${s.toFixed(3)}) translate(-640,-200)`);
+    zz.setAttribute('opacity', (1 - seg(bt, 1.0, 1.4)).toFixed(2));
+    drops.forEach(d => { const tau = Math.min(bt, .95); d.e.setAttribute('cx', f1(640 + d.vx * tau)); d.e.setAttribute('cy', f1(318 + d.vy * tau + 520 * tau * tau)); d.e.setAttribute('opacity', (1 - seg(bt, .3, .95)).toFixed(2)); });
+    const lp = eOut(seg(bt, 0, .35));
+    lines.forEach(L => { const r0 = 70 + lp * 40, r1 = r0 + 34 * (1 - seg(bt, .2, .5)); L.e.setAttribute('x1', f1(640 + Math.cos(L.a) * r0)); L.e.setAttribute('y1', f1(318 + Math.sin(L.a) * r0)); L.e.setAttribute('x2', f1(640 + Math.cos(L.a) * r1)); L.e.setAttribute('y2', f1(318 + Math.sin(L.a) * r1)); });
+    $('#speedLines').setAttribute('opacity', (1 - seg(bt, .3, .55)).toFixed(2));
+  }
+
+  /* notification */
+  const ny = lerp(-140, 30, eBack(seg(t, 44.6, 45.05))) - 180 * eIO(seg(t, 47.6, 48.1));
+  $('#notif').setAttribute('transform', `translate(640,${f1(ny)})`);
+
+  /* caption */
+  const c = CAPS.find(C => t >= C.a && t < C.b);
+  if (c) { if (cap.cur !== c.text) setCaption(c.text); cap.g.setAttribute('opacity', win(t, c.a, c.b, .3).toFixed(2)); }
+  else cap.g.setAttribute('opacity', 0);
+
+  /* endcard */
+  const onEnd = t >= 53.2;
+  show($('#endcard'), onEnd);
+  if (onEnd) {
+    $('#endcard').setAttribute('opacity', seg(t, 53.2, 53.8).toFixed(2));
+    const mp = eBack(seg(t, 53.8, 54.3));
+    const ang = lerp(-26, 9, mp);
+    $('#em1').setAttribute('transform', `translate(${f1(lerp(-70, -34, mp))},0) rotate(${f1(ang)})`);
+    $('#em2').setAttribute('transform', `translate(${f1(lerp(70, 34, mp))},0) rotate(${f1(-ang)})`);
+    $('#emSpark').setAttribute('opacity', win(t, 54.2, 55.2, .2).toFixed(2));
+    ['end1', 'end2', 'end3', 'end4'].forEach((id, i) => { const e = $('#' + id), q = eOut(seg(t, 53.6 + i * .45, 54.2 + i * .45)); e.setAttribute('opacity', q.toFixed(2)); e.setAttribute('transform', `translate(0,${f1((1 - q) * 14)})`); });
+  }
+
+  /* fades */
+  let fade = 0;
+  if (t >= 7.3 && t < 8.2) fade = seg(t, 7.3, 8.2);
+  else if (t >= 8.2 && t < 9) fade = 1 - seg(t, 8.2, 9);
+  fade = Math.max(fade, seg(t, 59.3, 60));
+  $('#fade').setAttribute('opacity', fade.toFixed(2));
+}
+
+/* ---------------- SOUND (optional, synthesized) ---------------- */
+let actx = null, soundOn = false;
+function audio() {
+  if (!actx) { const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return null; try { actx = new AC(); } catch (e) { return null; } }
+  if (actx.state === 'suspended') actx.resume();
+  return actx;
+}
+function tone(f, start, dur, type, gain) {
+  const c = audio(); if (!c) return;
+  const o = c.createOscillator(), g = c.createGain(), now = c.currentTime + start;
+  o.type = type; o.frequency.value = f;
+  g.gain.setValueAtTime(.0001, now); g.gain.exponentialRampToValueAtTime(gain, now + .008); g.gain.exponentialRampToValueAtTime(.0001, now + dur);
+  o.connect(g).connect(c.destination); o.start(now); o.stop(now + dur + .05);
+}
+const SFX = [
+  { t: 22.5, f: () => { tone(180, 0, .18, 'triangle', .12); tone(230, .25, .16, 'triangle', .1); } },
+  { t: 26.3, f: () => { [[2093, 0], [3136, 0], [2637, .05], [3951, .05]].forEach(([f, d]) => tone(f, d, 1.1, 'sine', .12)); } },
+  { t: 44.6, f: () => { [0, .3, .6].forEach(d => tone(150, d, .2, 'square', .035)); tone(1318, .05, .5, 'sine', .08); } },
+  { t: 49.8, f: () => { [523, 659, 784, 1047].forEach((f, i) => tone(f, i * .09, .5, 'triangle', .08)); } },
+  { t: 54.2, f: () => { tone(2637, 0, .8, 'sine', .08); tone(3520, .02, .7, 'sine', .06); } },
+];
+
+/* ---------------- PLAYER ---------------- */
+let t = 0, playing = false, last = null;
+const playBtn = $('#play'), scrub = $('#scrub'), timeEl = $('#time'), big = $('#bigplay');
+const ICON_PLAY = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4l14 8-14 8z" fill="currentColor"/></svg>';
+const ICON_PAUSE = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4h4v16H6zM14 4h4v16h-4z" fill="currentColor"/></svg>';
+const fmt = s => { s = Math.floor(s); return String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0'); };
+const CH = [[0, '퇴근길'], [9, '계좌 확인'], [21.6, '짠'], [29.4, '위로'], [42.6, '미국장 개장'], [53.2, '엔딩']];
+const chipEls = CH.map(([ct, name]) => {
+  const li = document.createElement('li'), b = document.createElement('button');
+  b.type = 'button'; b.className = 'chip'; b.innerHTML = `<span class="t">${fmt(ct)}</span>${name}`;
+  b.addEventListener('click', () => { seek(ct + .01); });
+  li.appendChild(b); $('#chapters').appendChild(li); return b;
+});
+function setPlaying(v) {
+  playing = v; last = null;
+  playBtn.innerHTML = (v ? ICON_PAUSE : ICON_PLAY) + `<span class="lbl">${v ? '일시정지' : '재생'}</span>`;
+  playBtn.setAttribute('aria-label', v ? '일시정지' : '재생');
+  big.hidden = v;
+}
+function ui() {
+  scrub.value = t.toFixed(2);
+  timeEl.textContent = fmt(t) + ' / ' + fmt(DUR);
+  let ci = 0; CH.forEach((c, i) => { if (t >= c[0]) ci = i; });
+  chipEls.forEach((b, i) => b.setAttribute('aria-current', i === ci ? 'true' : 'false'));
+}
+function seek(v) { t = clamp(v, 0, DUR - .001); render(t, 1); ui(); }
+function frame(now) {
+  if (playing) {
+    if (last == null) last = now;
+    const dt = Math.min(.1, (now - last) / 1000); last = now;
+    const prev = t; t += dt;
+    if (t >= DUR) t = 0;
+    if (soundOn && t > prev) SFX.forEach(s => { if (prev < s.t && t >= s.t) s.f(); });
+    render(t, dt); ui();
+  }
+  requestAnimationFrame(frame);
+}
+playBtn.addEventListener('click', () => setPlaying(!playing));
+big.addEventListener('click', e => { e.stopPropagation(); setPlaying(true); });
+$('#stageWrap').addEventListener('click', () => setPlaying(!playing));
+$('#restart').addEventListener('click', () => { seek(0); setPlaying(true); });
+scrub.addEventListener('input', () => seek(+scrub.value));
+$('#sound').addEventListener('click', e => {
+  soundOn = !soundOn; if (soundOn) audio();
+  e.currentTarget.setAttribute('aria-pressed', soundOn);
+  $('#soundLbl').textContent = soundOn ? '소리 끄기' : '소리 켜기';
+  $('#soundWave').setAttribute('opacity', soundOn ? 1 : .35);
+});
+document.addEventListener('keydown', e => {
+  if (e.code !== 'Space') return;
+  const tag = e.target && e.target.tagName;
+  if (tag === 'BUTTON' || tag === 'INPUT' || tag === 'TEXTAREA') return;
+  e.preventDefault(); setPlaying(!playing);
+});
+function remeasure() { tickW = ticker.getComputedTextLength() || tickW; BUB.a.cur = BUB.b.cur = cap.cur = null; render(t, 1); }
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(remeasure);
+remeasure();
+
+const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+if (reduce) { seek(26.45); setPlaying(false); } else { seek(0); setPlaying(true); }
+requestAnimationFrame(frame);
+})();
+</script>
